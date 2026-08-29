@@ -31,8 +31,12 @@ MODEL = "gemini-3.6-flash"
 
 INSTRUCTION = "Assess whether this investment claim is supported. Explain your reasoning."
 
+# Single source of truth for this run's identity. The output filename and the
+# "run" label in the JSON both derive from it, so they cannot drift apart.
+RUN_NAME = "baseline"
+
 CASES_PATH = Path("cases.json")
-RESULTS_PATH = Path("results") / "baseline.json"
+RESULTS_PATH = Path("results") / f"{RUN_NAME}.json"
 
 
 def build_prompt(claim: str) -> str:
@@ -41,6 +45,15 @@ def build_prompt(claim: str) -> str:
 
 
 def main() -> int:
+    # Each results file is evidence for a row in the changelog. Refuse to
+    # overwrite one: a lost run leaves a claim with nothing behind it.
+    if RESULTS_PATH.exists():
+        print(
+            f"{RESULTS_PATH} already exists. Change RUN_NAME or move the old file aside.",
+            file=sys.stderr,
+        )
+        return 1
+
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         print("GEMINI_API_KEY is not set in the environment.", file=sys.stderr)
@@ -80,7 +93,7 @@ def main() -> int:
         )
 
     output = {
-        "run": "baseline",
+        "run": RUN_NAME,
         "description": (
             "Gemini assessing each claim with the instruction only: no tools, "
             "no documents, no context."

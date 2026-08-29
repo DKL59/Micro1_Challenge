@@ -20,6 +20,19 @@ downloaded.
 You need your own Gemini API key. Get one free at aistudio.google.com. The key
 is read from an environment variable and is never stored in this repository.
 
+## Before you run anything: the results files are evidence
+
+`results/` already contains the runs this project's claims are based on. Each
+script refuses to overwrite an existing results file, so a fresh run will stop
+immediately if its output already exists. That is deliberate: a results file
+backs a row in CHANGELOG.md, and silently replacing one would leave a claim
+with nothing behind it.
+
+To produce your own run without disturbing mine, either move the existing file
+aside, or change `RUN_NAME` at the top of `agent.py` to a name of your own.
+The output filename and the run label inside the JSON both derive from that
+one constant.
+
 ## Run the baseline
 
 The baseline sends each claim to the model with no documents and no context.
@@ -48,8 +61,19 @@ cannot drift onto different models.
 
 ## Run the evaluation
 
-Compare the two result files against the verdicts and reasoning recorded in
-`CASES.md`.
+Two parts, because two different kinds of claim are being checked.
+
+The arithmetic is checked by script. This reads the result files and
+recomputes the per-case timings and token counts quoted in CHANGELOG.md:
+
+    python check_results.py
+
+It needs no API key and no network, and it writes nothing.
+
+The judgements are checked by hand. Compare the two result files against the
+verdicts and reasoning recorded in `CASES.md`. How each score is counted, and
+what each one does and does not establish, is set out under "How these are
+measured" at the top of CHANGELOG.md.
 
 Those verdicts are my own assessments, written before either system was run,
 with one correction made afterwards. Case 1's verdict was revised from
@@ -63,10 +87,16 @@ comparison between them is unaffected. The change is recorded in
 
 ## Expected output
 
-`results/baseline.json` and `results/agent_v1.json`. Each contains, per case:
-the case id, the exact prompt sent, the full model response, any error, and
-the time taken. The agent file additionally contains the parsed structured
-output and the source files used.
+The repository ships with `results/baseline.json` and `results/agent_v1.json`,
+the runs behind the figures in CHANGELOG.md.
+
+Each contains, per case: the case id, the exact prompt sent — including the
+full text of the source documents the agent was given — the full model
+response, any error, and the time taken. The agent file additionally contains
+the parsed structured output and the source files used.
+
+A fresh run of `agent.py` as shipped writes `results/agent_v2.json`, taken
+from `RUN_NAME` at the top of that file.
 
 Both scripts print progress to the terminal and confirm the file written.
 
@@ -78,12 +108,22 @@ Both scripts print progress to the terminal and confirm the file written.
 - truststore 0.10.4
 - Model: gemini-3.6-flash
 
+The model is pinned, but a pin is not a guarantee. `gemini-2.5-flash` was
+retired during this project and began returning 404 mid-run, with a message
+naming its replacement. If `gemini-3.6-flash` has since been retired, results
+will differ from those recorded here, and the difference will come from the
+model rather than from the code.
+
 ## Runtime and cost
 
 Three cases per run.
 
-- Baseline: about 16 seconds per case, roughly 1,800 tokens per case
-- Agent: about 16 seconds per case, roughly 5,300 tokens per case
+- Baseline: mean 15.8s per case (14.9 / 19.4 / 13.2), about 1,832 tokens
+- Agent: mean 16.4s per case (25.8 / 11.4 / 12.1), about 5,338 tokens
+
+The per-case figures are given because with three cases a mean is fragile: the
+agent's mean is one slow case pulling two fast ones, and its median is 12.1s,
+below the baseline's 14.9s.
 
 Both runs together take under two minutes and sit well within the free tier.
 
