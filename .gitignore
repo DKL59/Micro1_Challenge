@@ -1,4 +1,6 @@
 .gemini/
 .env
 *.key
+*.pyc
+.venv/
 __pycache__/
