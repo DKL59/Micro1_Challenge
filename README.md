@@ -1,8 +1,8 @@
 # NEPSE Claim Validator
 
 A tool that checks whether an investment claim circulating publicly is
-actually supported by the company's filings and current market conditions.
-It does not tell anyone what to buy.
+actually supported by the company's published results and current market
+conditions. It does not tell anyone what to buy.
 
 ## Intended user
 
@@ -40,8 +40,9 @@ not follow the connection between deposit rates and NEPSE lost money they
 could have moved.
 
 That was 2022 into 2023, and it is history rather than a description of
-now. Deposit rates today run from 2.75% to 4.55%, and the money that left
-the market for the banks has no such reason to stay there. It is here
+now. Deposit rates today run from 2.75% to 4.55% on ordinary individual
+deposits, and up to 5.55% on remittance-linked ones, and the money that
+left the market for the banks has no such reason to stay there. It is here
 because it is why I understand this problem: I invested through that period
 and exited in 2023, and the calculation I was making by hand — is this
 dividend worth more than a deposit — is the one this tool performs.
@@ -85,17 +86,22 @@ at the top of each script, so it can be read without running anything.
 
 - `baseline.py` — a single sentence: "Assess whether this investment claim
   is supported. Explain your reasoning." Nothing else is sent.
-- `agent.py` — the same task, plus the required JSON schema and four rules:
-  every figure must come from the source documents, anything absent is
-  marked `not_found` rather than estimated, arithmetic must be shown, and
-  the system never advises buying or selling.
+- `agent.py` — the same task, plus the required JSON schema and a set of
+  rules: break the claim into separate assertions and check each one; every
+  figure must come from the source documents; anything absent is marked
+  `not_found` rather than estimated; arithmetic must be shown; and the
+  system never advises buying or selling.
 
 `agent.py` imports `MODEL` from `baseline.py` so the two runs cannot drift
 onto different models.
 
-The source documents the agent reads are in `sources/`, one file per
-company plus `macro.md` for the deposit-rate benchmark. Each case in
-`cases.json` names the files it is given.
+The source documents the agent reads are in `sources/` — one file per
+company plus `macro.md` for the deposit-rate benchmark — and contain only
+published figures, each with the URL it came from. Each case in `cases.json`
+names the files it is given. My own analysis of those figures — computed
+yields, cross-checks, conclusions — lives in `notes/`, which the agent never
+sees. That split was made after Iteration 1 showed the agent quoting my
+conclusions back as evidence. `notes/README.md` records what moved and why.
 
 ## Tools disclosed
 
@@ -116,6 +122,9 @@ company plus `macro.md` for the deposit-rate benchmark. Each case in
   primary source before use, and several of its suggestions did not survive
   that check. One summary it produced cited article titles that do not
   exist. 29 August 2026.
+
+Session transcripts for each agent are in `trajectories/`, with a manifest
+explaining what each file covers and recording one redaction.
 
 ## Evaluation
 
@@ -139,11 +148,57 @@ See CHANGELOG.md.
 
 ## Main failure mode
 
-_To be written after the final iteration._
+The system verifies numbers. It does not reliably verify claims.
+
+On Case 1 the claim says "Bank FD is giving only 4%". The agent searched the
+rate cards, found Nabil's five-to-ten-year row at 4.00%, and marked the
+assertion **verified**. The number is real. The claim is not: 4% is the
+best rate available at the longest tenure, from a range running 2.75% to
+4.55%, and the claim uses it to mean the most a deposit can pay. The agent
+matched a figure to a line and stopped.
+
+It also stops short of arithmetic it has not been given. On the same case
+`computed` came back empty — it never worked out 12.50 / 540.20 = 2.31%, so
+it never discovered that Nabil's dividend yield falls below every deposit
+rate surveyed. That comparison decides the case, and it did not happen. In
+the previous iteration the answer was sitting in the source file; when it was
+removed, the agent did not reconstruct it.
+
+The consequence for a user is specific. A claim built on a real figure with
+the qualifier stripped off — the tenure, the fiscal year, the depositor
+category, the entity — can pass this system's checks. That describes most
+misleading investment claims, including two of the three in this evaluation.
+
+The fix is not a better model. It is a stricter instruction: require the
+system to state the full range and name the tenure and category it is
+comparing against, and to compute the yield before comparing anything to it.
+That is the next iteration, and it is not done.
 
 ## Hot take
 
-_To be written._
+Grounding a model in documents does not make it verify things. It makes it
+quote things. Those look identical in the output and they are not the same
+capability, and the difference is invisible unless you go looking for it.
+
+This project scored 1 out of 1 on catching a planted attribution error and I
+believed it for most of a day. Then I read the evidence file and found the
+agent had quoted a sentence I had written into the source myself, under a
+heading that named the check it was performing. I had graded a system on
+whether it could find an answer I had already given it.
+
+So here is the test I would apply to any retrieval-augmented system, my own
+included: remove your conclusions from the corpus and run it again. Whatever
+survives is the capability. Whatever disappears was your own work, reflected
+back at you. When I did that, the attribution catch held and a verdict I was
+proud of fell over.
+
+And one thing I did not expect. Every wrong number in this project's
+documentation was put there by a human. The 30% dividend, the 2-out-of-3
+baseline score, the count of contaminated quotes — each was asserted by me
+or by my assistant without opening the file it came from, and each was
+caught only by opening it. The model invented figures too; the baseline run
+is a record of exactly that. But it never did so with a source in front of
+it. Given a source, it cited the source. Given a deadline, we guessed.
 
 ## What existed before this competition
 
@@ -154,8 +209,8 @@ trajectory export. All four existed only to confirm that the toolchain
 worked and that agent traces could be exported before the competition began.
 
 That trajectory file has since been renamed to
-`trajectory-00-gemini-setup-test.json` for clarity. The rename is visible in
-the commit history.
+`trajectory-00-gemini-setup-test.json` and moved into `trajectories/`. Both
+changes are visible in the commit history.
 
 The original planning brief, written on the evening of 28 August before the
 market was chosen, is preserved unedited as `PLAN-2026-08-28.md`. Where it

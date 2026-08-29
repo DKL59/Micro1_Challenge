@@ -500,3 +500,37 @@ sitting in that file since the morning.
 
 **Consequence:** the sweep runs again immediately before submission, not only
 before commits.
+
+## 29 Aug 2026 — Iteration 2 result: the finding held, a verdict did not
+
+**The prediction, registered before the run:** if the attribution error still
+surfaces once the answer is removed from the source file, the finding stands;
+if it does not, the negative result is reported as the finding instead.
+
+**What happened:** it surfaced, and more of it than before. With the
+signposted sentence gone, the agent quoted the raw sector line to contradict
+"EBL net profit up 32% this quarter", separately quoted "Nabil Bank is
+reported as leading the sector" to contradict "best in the sector", and
+derived both supporting figures itself — price to book 729.50 / 246.74 =
+2.96, and EBL's own growth of 30.69% from the two net profit figures. In
+Iteration 1 both numbers were sitting in the file waiting to be copied. The
+1 of 1 on attribution now measures detection.
+
+**What it cost:** verdict agreement fell from 3 of 3 to 2 of 3. Case 1 came
+back "partly supported" rather than "unsupported", because the agent marked
+"Bank FD is giving only 4%" as verified against a single rate-card row — the
+5-to-10-year tenure at Nabil — from a range running 2.75% to 4.55%. And
+`computed` came back empty: it never worked out 12.50 / 540.20 = 2.31%, so
+the comparison that decides the case never happened. In Iteration 1 that
+yield was handed to it.
+
+**Decision:** report both. The score that fell was propped up by my source
+files; the score that held is now worth something. A 3 of 3 built on a corpus
+that contained the answers is worth less than a 2 of 3 that does not.
+
+**What it revealed:** the agent verified a number and missed the claim. That
+is the failure Case 3 was built to test, committed by the agent on Case 1, in
+the same run where it caught Case 3 unaided. It is now the system's
+documented main failure mode rather than a hypothesis about one.
+
+**Evidence:** results/agent_v2.json, and the Iteration 2 row in CHANGELOG.md.
