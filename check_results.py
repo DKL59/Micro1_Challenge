@@ -11,6 +11,7 @@ than guessing.
 
 Figures traceable to a source and attribution errors caught are human
 judgements and are not scored here. See CHANGELOG.md for how they are counted.
+Schema violations are scored separately by validate.py.
 """
 
 import json
@@ -18,7 +19,7 @@ import statistics
 from pathlib import Path
 
 # Each run's results file. Add new runs here as they are produced.
-RUNS = ["baseline", "agent_v1", "agent_v2", "agent_v3"]
+RUNS = ["baseline", "agent_v1", "agent_v2", "agent_v3", "agent_v4"]
 
 CASES_PATH = Path("cases.json")
 
@@ -38,7 +39,14 @@ def summarise(name: str, expected: dict[str, str]) -> None:
     cases = json.loads(path.read_text(encoding="utf-8"))["results"]
 
     times = [c["time_taken_seconds"] for c in cases]
-    tokens = [c["response_raw"]["usage_metadata"]["total_token_count"] for c in cases]
+
+    # Runs with a correction loop record the total across all attempts;
+    # earlier runs made one call, so the final response carries the whole cost.
+    tokens = [
+        c.get("total_tokens_all_attempts")
+        or c["response_raw"]["usage_metadata"]["total_token_count"]
+        for c in cases
+    ]
 
     print(f"\n{name}  ({len(cases)} cases)")
 
@@ -57,7 +65,11 @@ def summarise(name: str, expected: dict[str, str]) -> None:
         match = "match" if got == want else f"DIFFERS (recorded: {want})"
         if got == want:
             agreed += 1
-        print(f"  {case['id']}: {got} -- {match}")
+
+        # Runs with a correction loop report how many calls each case took.
+        used = case.get("attempts_used")
+        suffix = f"   [{used} attempt(s)]" if used else ""
+        print(f"  {case['id']}: {got} -- {match}{suffix}")
 
     if scorable:
         print(f"  verdict agreement: {agreed}/{scorable} (machine-checked)")

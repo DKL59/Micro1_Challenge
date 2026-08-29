@@ -15,8 +15,9 @@ Since Iteration 4 the response is checked before it is accepted. validate.py
 applies three mechanical rules -- permitted status, quote present in the file
 it names, figures present in their own quote. A response that breaks any of
 them is sent back with the violations named, up to MAX_ATTEMPTS times. Every
-attempt is recorded, so the correction is visible in the evidence rather than
-hidden behind a clean final answer.
+attempt is recorded, with its own token count, so both the correction and its
+cost are visible in the evidence rather than hidden behind a clean final
+answer.
 
 The API key is read from the environment variable GEMINI_API_KEY and is never
 written to any output file.
@@ -201,6 +202,12 @@ def main() -> int:
                     "response_text": response_text,
                     "response_json": response_json,
                     "violations": violations,
+                    # Recorded per attempt: the loop can make several calls,
+                    # and the cost of a corrected answer is all of them, not
+                    # just the last.
+                    "total_tokens": (response_raw or {})
+                    .get("usage_metadata", {})
+                    .get("total_token_count"),
                 }
             )
 
@@ -226,6 +233,9 @@ def main() -> int:
                 "prompt": prompt,
                 "attempts": attempts,
                 "attempts_used": len(attempts),
+                "total_tokens_all_attempts": sum(
+                    a["total_tokens"] or 0 for a in attempts
+                ),
                 "final_violations": attempts[-1]["violations"] if attempts else None,
                 "response_text": response_text,
                 "response_json": response_json,
