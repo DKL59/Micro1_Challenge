@@ -3,6 +3,11 @@
 Retrieved: 29 August 2026
 Market figures as of: 27 August 2026
 
+Coverage: market data, capital structure, annual and quarterly results, and
+dividend history as published on NEPSE, with dividend history corroborated by
+Investopaper. Corporate announcements, board disclosures and book-closure
+notices are not included.
+
 Sources:
 - Market data, annual and quarterly results, dividend history:
   https://www.nepalstock.com/company/detail/139
@@ -64,44 +69,18 @@ Source: NEPSE (Bikram Sambat fiscal years)
 | 2073/2074 | 20.00% | 1.05% | 21.05% |
 | 2072/2073 | 26.00% | 1.37% | 27.37% |
 
-## Verification notes
+## Source agreement
 
-Two independent sources agree on the recent dividend record. Investopaper
-reports in Gregorian fiscal years, NEPSE in Bikram Sambat. Mapping:
+Investopaper reports in Gregorian fiscal years, NEPSE in Bikram Sambat. The
+two agree where they overlap.
 
-| Investopaper (AD) | NEPSE (BS) | Dividend | Agreement |
-|---|---|---|---|
-| 2022/23 | 2079/2080 | 30.53% (1.53% cash + 29% bonus) | Match |
-| 2023/24 | 2080/2081 | No dividend | Match |
-| 2020/21 | 2077/2078 | No dividend | Match |
-| 2021/22 | 2078/2079 | No dividend | Match |
+| Investopaper (AD) | NEPSE (BS) | Dividend |
+|---|---|---|
+| 2022/23 | 2079/2080 | 30.53% (1.53% cash + 29% bonus) |
+| 2023/24 | 2080/2081 | No dividend |
+| 2021/22 | 2078/2079 | No dividend |
+| 2020/21 | 2077/2078 | No dividend |
 
-Calendar caution: sources for this market mix Bikram Sambat and Gregorian
-fiscal years. The same period appears as 2080/81 in one source and 2023/24
-in another. Any comparison across sources must reconcile the calendar first.
-
-Note on source framing: the Investopaper article describes NIC Asia as having
-"provided consistent dividends to shareholders." The company paid nothing in
-four of the last five fiscal years. The statement is defensible across a
-twenty-year window and misleading about the present — an example of the exact
-failure mode this project addresses, published by a financial news site rather
-than an anonymous influencer.
-
-## Computed
-
-- Price to book: 308.10 / 172.32 = 1.79x
-- Net profit change, 2079/80 to 2080/81: -84.2%
-- EPS change, 2079/80 to 2080/81: 38.44 to 4.70 = -87.8%
-- Net worth per share, 2079/80 to latest quarter: 254.16 to 172.32 = -32.2%
-- Price against 52-week high: 308.10 against 411.00 = -25.0%
-- No dividend in the last two fiscal years; none in four of the last five
-
-## Cross-checks
-
-- Market capitalisation: 149,175,670 x 308.10 = Rs 45,961,023,927 — matches
-  the published figure exactly
-- Paid-up value / listed shares = Rs 100 par — consistent with NEPSE convention
-
-## Not yet sourced
-
-- Any disclosed bonus share announcement for the current fiscal year
+Calendar note: sources for this market mix Bikram Sambat and Gregorian fiscal
+years. The same period appears as 2080/81 in one source and 2023/24 in
+another.
