@@ -22,7 +22,11 @@ against the result files.
   Rule 3 checks numbers rather than whole strings, because the model often
   adds a descriptive gloss which is not itself a claim about the source. This
   metric was built in Iteration 4 and applied retrospectively to every
-  earlier run.
+  earlier run. It overlaps with "figures traceable to a source": rule 2
+  checks mechanically what that metric scores by hand. They are reported
+  separately because the older metric scores all-or-nothing per case while
+  this one counts every violation, and because the older one predates the
+  validator — but they are not independent measures.
 - **Figures traceable to a source (out of 3)** — for a case to count, every
   figure the system reports must name the source file it came from and quote
   a line that actually appears in that file. A case with one invented number
