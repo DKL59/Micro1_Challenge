@@ -41,7 +41,9 @@ changelog treats them as history for that reason.
 Two of the four metrics can be verified with no API calls at all:
 `check_results.py` and `validate.py` read the committed result files and
 recompute their figures. If you only want to check whether the numbers in
-CHANGELOG.md are real, start there — it costs nothing.
+CHANGELOG.md are real, start there — it costs nothing. `test_validate.py` is
+free in the same way: it tests the validator's own rules and needs nothing but
+Python.
 
 If you do run several times in a day, watch the quota. It ran out mid-run
 here and cost a control experiment.
@@ -108,8 +110,8 @@ them on the second attempt, but model output varies and yours may not.
 
 Two parts, because two different kinds of claim are being checked.
 
-The reproducible part is checked by two scripts. Neither needs an API key or a
-network connection, and neither writes anything.
+The reproducible part is checked by three scripts. None of them needs an API
+key or a network connection, and none writes anything.
 
     python check_results.py
 
@@ -127,8 +129,18 @@ the source text recorded in that run's own prompt, so a run made before
 Iteration 2 replaced the source files is still judged against what it was
 actually shown.
 
+    python test_validate.py
+
+runs twenty-three tests over `validate.py` itself: that each of its rules
+catches what it should and passes what it should, and that four known gaps in
+those rules still behave as documented. It prints one line per test and a
+final count, and exits non-zero if anything fails. The four gap tests are
+written to fail if a rule is ever tightened — which is the signal to update
+the failure-mode section of README.md alongside the code.
+
 If you produce runs under new names, add them to the `RUNS` list at the top of
-each script and they will be scored alongside the rest.
+`check_results.py` and `validate.py` and they will be scored alongside the
+rest.
 
 The rest is human judgement. The baseline returns free text, so its verdicts
 cannot be parsed and were scored by hand. Figures traceable to a source and
@@ -149,7 +161,8 @@ unaffected. The change is recorded in `DECISIONS.md`.
 
 ## Expected output
 
-The repository ships with five result files, one per row in CHANGELOG.md:
+Five result files back the rows in CHANGELOG.md, and a sixth is explained
+below:
 
 - `results/baseline.json` — the control condition, no documents
 - `results/agent_v1.json` — grounded, against the original source files
@@ -171,6 +184,14 @@ Iteration 2 can be read directly from the evidence rather than taken on trust.
 `agent_v4.json` additionally records every attempt: the prompt sent, the
 response, the violations found and the tokens spent, for each pass through the
 loop. Where a case took two attempts, both are there.
+
+A sixth file is present and is not one of the five:
+`results/agent_v5-quota-failed.json` is the control run — the shipped
+instruction with the correction loop disabled — which exhausted the daily
+quota before completing. It is kept rather than deleted because results files
+are evidence, and a failed run is evidence too. It backs no row in
+CHANGELOG.md, is not listed in either scoring script, and should not be read
+as a result.
 
 A fresh run writes `results/<RUN_NAME>.json`. Both scripts print progress to
 the terminal and confirm the file written.
@@ -229,5 +250,3 @@ certificate is already trusted. Both `baseline.py` and `agent.py` call
 If pip itself cannot reach PyPI, run this once:
 
     pip config set global.use-feature truststore
-
-None of this is required on a machine without TLS interception.
