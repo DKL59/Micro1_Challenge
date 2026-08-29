@@ -25,8 +25,8 @@ being quoted. This is not a tool I designed for someone else's problem.
 
 ## Current bottleneck
 
-They act on advice received from someone else, without validating it. That
-hurts in two ways. They do not know why a particular stock is being
+These investors act on advice received from someone else, without validating
+it. That hurts in two ways. They do not know why a particular stock is being
 promoted, or what the person promoting it stands to gain. And they are
 usually unaware of the macro conditions that determine whether any stock
 does well.
@@ -42,10 +42,10 @@ could have moved.
 That was 2022 into 2023, and it is history rather than a description of
 now. Deposit rates today run from 2.75% to 4.55% on ordinary individual
 deposits, and up to 5.55% on remittance-linked ones, and the money that
-left the market for the banks has no such reason to stay there. It is here
-because it is why I understand this problem: the calculation I was making
-by hand — is this dividend worth more than a deposit — is the one this tool
-performs.
+left the market for the banks has no such reason to stay there. The history
+is here because it is why I understand the problem: the calculation I was
+making by hand — is this dividend worth more than a deposit — is the one
+this tool performs.
 
 ## Why solving it is valuable
 
@@ -133,9 +133,9 @@ conclusions back as evidence. `notes/README.md` records what moved and why.
   Not a development tool.
 - **Claude (Opus 5), via chat** — problem selection, scoping, review of
   agent output, drafting of documentation, `check_results.py`, `validate.py`,
-  the overwrite guards in both scripts, the Iteration 2 rewrite of `sources/`
-  and `notes/`, the instruction rules added in Iterations 3 and 4, and the
-  validation loop. 28–31 August 2026.
+  `test_validate.py`, the overwrite guards in both scripts, the Iteration 2
+  rewrite of `sources/` and `notes/`, the instruction rules added in
+  Iterations 3 and 4, and the validation loop. 28–31 August 2026.
 - **Gemini CLI** — used once on 28 August to verify trajectory export
   before the competition began. Not used to build this project.
 - **Gemini (free web version)** — used to locate candidate sources for the
@@ -165,11 +165,33 @@ How each score is counted, and what it does and does not establish, is set
 out at the top of `CHANGELOG.md`. Two of the four metrics are recomputable
 from the result files without an API key: `check_results.py` gives per-case
 timings, token counts and verdict agreement; `validate.py` gives the schema
-violation count for any run.
+violation count for any run. `test_validate.py` checks the validator's own
+three rules against twenty-three hand-built tests, and needs no key either.
 
 ## Improvement changelog
 
 See CHANGELOG.md.
+
+## What existed before this competition
+
+The repository was created on 27 August 2026, before kickoff, with a single
+commit containing four files: a throwaway `fib.py`, a `.gitignore`, a
+`.gitattributes` created automatically by the git client, and a Gemini CLI
+trajectory export. All four existed only to confirm that the toolchain
+worked and that agent traces could be exported before the competition began.
+
+That trajectory file has since been renamed to
+`trajectory-00-gemini-setup-test.json` and moved into `trajectories/`. Both
+changes are visible in the commit history.
+
+The original planning brief, written on the evening of 28 August before the
+market was chosen, is preserved unedited as `PLAN-2026-08-28.md`. Where it
+diverges from what was actually built, the divergence is the record.
+
+Everything else — the sources, the evaluation cases, both scripts, the
+results and every document in this repository — was built between 28 and 31
+August 2026. The commit history is timestamped throughout and can be checked
+against these dates.
 
 ## Main failure mode
 
@@ -262,24 +284,3 @@ or by my assistant without opening the file it came from, and each was
 caught only by opening it. The model invented figures too; the baseline run
 is a record of exactly that. But it never did so with a source in front of
 it. Given a source, it cited the source. Given a deadline, we guessed.
-
-## What existed before this competition
-
-The repository was created on 27 August 2026, before kickoff, with a single
-commit containing four files: a throwaway `fib.py`, a `.gitignore`, a
-`.gitattributes` created automatically by the git client, and a Gemini CLI
-trajectory export. All four existed only to confirm that the toolchain
-worked and that agent traces could be exported before the competition began.
-
-That trajectory file has since been renamed to
-`trajectory-00-gemini-setup-test.json` and moved into `trajectories/`. Both
-changes are visible in the commit history.
-
-The original planning brief, written on the evening of 28 August before the
-market was chosen, is preserved unedited as `PLAN-2026-08-28.md`. Where it
-diverges from what was actually built, the divergence is the record.
-
-Everything else — the sources, the evaluation cases, both scripts, the
-results and every document in this repository — was built between 28 and 31
-August 2026. The commit history is timestamped throughout and can be checked
-against these dates.
