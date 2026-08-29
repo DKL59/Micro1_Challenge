@@ -29,9 +29,9 @@ backs a row in CHANGELOG.md, and silently replacing one would leave a claim
 with nothing behind it.
 
 To produce your own run without disturbing mine, either move the existing file
-aside, or change `RUN_NAME` at the top of `agent.py` to a name of your own.
-The output filename and the run label inside the JSON both derive from that
-one constant.
+aside, or change `RUN_NAME` at the top of the script you are running to a name
+of your own. The output filename and the run label inside the JSON both derive
+from that one constant.
 
 ## Run the baseline
 
@@ -90,10 +90,10 @@ comparison between them is unaffected. The change is recorded in
 The repository ships with `results/baseline.json` and `results/agent_v1.json`,
 the runs behind the figures in CHANGELOG.md.
 
-Each contains, per case: the case id, the exact prompt sent — including the
-full text of the source documents the agent was given — the full model
+Each contains, per case: the case id, the exact prompt sent, the full model
 response, any error, and the time taken. The agent file additionally contains
-the parsed structured output and the source files used.
+the parsed structured output, the source files used, and — inside each
+recorded prompt — the full text of the documents the agent was shown.
 
 A fresh run of `agent.py` as shipped writes `results/agent_v2.json`, taken
 from `RUN_NAME` at the top of that file.
