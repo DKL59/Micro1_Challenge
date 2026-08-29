@@ -8,7 +8,7 @@ differences are what the model receives and what it is asked to return:
   agent.py    -> instruction + source documents + claim, structured JSON
 
 Every figure in the answer must be traceable to a line in the source documents.
-The difference between results/agent_v1.json and results/baseline.json is the
+The difference between this run's output and results/baseline.json is the
 measure of what grounding adds.
 
 The API key is read from the environment variable GEMINI_API_KEY and is never
@@ -69,8 +69,12 @@ it.
 - Never advise buying or selling. Describe what the evidence shows and stop.\
 """
 
+# Single source of truth for this run's identity. The output filename and the
+# "run" label in the JSON both derive from it, so they cannot drift apart.
+RUN_NAME = "agent_v2"
+
 CASES_PATH = Path("cases.json")
-RESULTS_PATH = Path("results") / "agent_v1.json"
+RESULTS_PATH = Path("results") / f"{RUN_NAME}.json"
 
 
 def load_sources(paths: list[str]) -> str:
@@ -92,6 +96,15 @@ def build_prompt(sources_text: str, claim: str) -> str:
 
 
 def main() -> int:
+    # Each results file is evidence for a row in the changelog. Refuse to
+    # overwrite one: a lost run leaves a claim with nothing behind it.
+    if RESULTS_PATH.exists():
+        print(
+            f"{RESULTS_PATH} already exists. Change RUN_NAME or move the old file aside.",
+            file=sys.stderr,
+        )
+        return 1
+
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         print("GEMINI_API_KEY is not set in the environment.", file=sys.stderr)
@@ -145,7 +158,7 @@ def main() -> int:
         )
 
     output = {
-        "run": "agent_v1",
+        "run": RUN_NAME,
         "description": (
             "Gemini assessing each claim against the company's filings plus "
             "macro context, required to return structured JSON with a source "
