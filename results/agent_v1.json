@@ -1,0 +1,359 @@
+{
+  "run": "agent_v1",
+  "description": "Gemini assessing each claim against the company's filings plus macro context, required to return structured JSON with a source quote for every figure.",
+  "model": "gemini-3.6-flash",
+  "instruction": "You are checking whether an investment claim is supported by a company's own filings. You are given a set of SOURCE DOCUMENTS and then a CLAIM.\n\nWork only from the source documents. Then return a single JSON object, and nothing else, in exactly this shape:\n\n{\n  \"verdict\": \"supported | partly supported | unsupported\",\n  \"assertions\": [\n    {\n      \"claim_text\": \"the specific assertion being checked\",\n      \"status\": \"verified | contradicted | not_found\",\n      \"source_figure\": \"the actual figure from the source documents\",\n      \"quote\": \"the exact line from the source document\",\n      \"source_file\": \"which file it came from\"\n    }\n  ],\n  \"computed\": {\"any calculation performed, showing the arithmetic\"},\n  \"summary\": \"two or three sentences for a retail investor\"\n}\n\nRules:\n- Break the claim into its separate assertions and check each one.\n- Every figure must come from the source documents. Do not use general knowledge about these companies.\n- If a figure is not in the sources, mark it not_found rather than estimating it.\n- Show the arithmetic for anything computed, e.g. \"1200 / 40000 = 0.03 = 3%\".\n- If \"computed\" has no entries, return it as an empty object {}.\n- Never advise buying or selling. Describe what the evidence shows and stop.",
+  "generated_at": "2026-08-29T08:12:06.303585+00:00",
+  "cases_file": "cases.json",
+  "results": [
+    {
+      "id": "case-1-nabil-dividend-vs-deposit",
+      "company": "NABIL",
+      "model": "gemini-3.6-flash",
+      "source_files": [
+        "sources/nabil.md",
+        "sources/macro.md"
+      ],
+      "prompt": "You are checking whether an investment claim is supported by a company's own filings. You are given a set of SOURCE DOCUMENTS and then a CLAIM.\n\nWork only from the source documents. Then return a single JSON object, and nothing else, in exactly this shape:\n\n{\n  \"verdict\": \"supported | partly supported | unsupported\",\n  \"assertions\": [\n    {\n      \"claim_text\": \"the specific assertion being checked\",\n      \"status\": \"verified | contradicted | not_found\",\n      \"source_figure\": \"the actual figure from the source documents\",\n      \"quote\": \"the exact line from the source document\",\n      \"source_file\": \"which file it came from\"\n    }\n  ],\n  \"computed\": {\"any calculation performed, showing the arithmetic\"},\n  \"summary\": \"two or three sentences for a retail investor\"\n}\n\nRules:\n- Break the claim into its separate assertions and check each one.\n- Every figure must come from the source documents. Do not use general knowledge about these companies.\n- If a figure is not in the sources, mark it not_found rather than estimating it.\n- Show the arithmetic for anything computed, e.g. \"1200 / 40000 = 0.03 = 3%\".\n- If \"computed\" has no entries, return it as an empty object {}.\n- Never advise buying or selling. Describe what the evidence shows and stop.\n\n=== SOURCE DOCUMENTS ===\n\n--- sources/nabil.md ---\n# NABIL — Nabil Bank Limited\n\nRetrieved: 29 August 2026\nMarket figures as of: 27 August 2026\n\nSources:\n- Dividend, market price, capital: https://www.sharesansar.com/company/nabil\n- EPS, net worth per share, P/E: https://www.nepalstock.com/company/detail/131\n- Dividend history, independent corroboration: https://hamroshare.com.np/company/NABIL/dividends\n- Benchmark deposit rates: https://www.nicasiabank.com/interest-rates/\n\n## Market data\n\n- Last traded price: Rs 540.20\n- 52-week high / low: Rs 568.00 / Rs 471.00\n- 120-day average: Rs 535.06\n\n## Capital\n\n- Sector: Commercial Banks\n- Listed shares: 270,569,984\n- Total paid-up value: Rs 27,056,998,400\n- Implied par value: Rs 100\n\n## Fundamentals (FY 2081/2082)\n\n- EPS: Rs 21.89\n- Net worth per share: Rs 231\n- P/E ratio: 24.73\n\n## Current dividend\n\n- Fiscal year: 2081/2082\n- Cash dividend: 12.50%\n- Bonus share: 0.00%\n- Book close date: 2025-12-31\n- Dividend per share: Rs 12.50 (12.50% of Rs 100 par)\n\n## Dividend history\n\n| Fiscal year (BS) | Bonus | Cash | Total |\n|---|---|---|---|\n| 2081/2082 | 0.00% | 12.50% | 12.50% |\n| 2080/2081 | 0.00% | 10.00% | 10.00% |\n| 2079/2080 | 0.00% | 11.00% | 11.00% |\n| 2078/2079 | 18.50% | 11.50% | 30.00% |\n| 2077/2078 | 33.60% | 4.40% | 38.00% |\n| 2076/2077 | 33.50% | 1.76% | 35.26% |\n| 2075/2076 | 12.00% | 22.00% | 34.00% |\n| 2074/2075 | 12.00% | 22.00% | 34.00% |\n| 2073/2074 | 30.00% | 18.00% | 48.00% |\n\n## Verification notes\n\nTwo independent sources agree on the recent dividend record:\n\n| Fiscal year | ShareSansar | Hamroshare | Agreement |\n|---|---|---|---|\n| 2081/2082 | 12.50% cash, book close 2025-12-31 | 12.50% cash, book close 2025-12-31 | Match |\n| 2080/2081 | 10.00% | 10.00% | Match |\n| 2079/2080 | 11.00% | 11.00% | Match |\n\nNote on source framing: Hamroshare reports Nabil as \"averaging 36.97% per\nyear\" across 15 fiscal years, with peaks of 65% in 2069/70 and 2070/71. The\ncurrent figure is 12.50%, a yield of 2.31% on market price. The average is\naccurate and misleading as a guide to the present.\n\nTrend: total dividend has fallen from 48% (2073/74) to 12.50% (2081/82).\nNo bonus shares issued in the last three fiscal years.\n\n## Computed\n\n- Dividend per share: Rs 12.50\n- Dividend yield on market price: 12.50 / 540.20 = 2.31%\n- Payout ratio: 12.50 / 21.89 = 57.1%\n- Price to book: 540.20 / 231 = 2.34x\n- Earnings yield: 21.89 / 540.20 = 4.05%\n\n## Cross-checks\n\n- P/E: 540.20 / 21.89 = 24.68 against published 24.73 — consistent within rounding\n- Paid-up value / listed shares = Rs 100 par — consistent with NEPSE convention\n\n## Benchmark comparison\n\nCurrent bank fixed deposit rates for individuals: 2.75% (shorter terms) to\n4.00% (five years and above), effective 1 Shrawan 2083 (July 2026).\nSource: NIC Asia Bank, https://www.nicasiabank.com/interest-rates/\n\nNabil's dividend yield of 2.31% is below the entire deposit range, and the\nshare carries price risk a deposit does not.\n\n--- sources/macro.md ---\n# Macro context\n\nRetrieved: 29 August 2026\n\nThis file holds the benchmark rates any dividend yield claim is compared\nagainst. The benchmark is read at runtime, never assumed.\n\n## Current fixed deposit rates — individuals\n\n### Nabil Bank, effective 1 Bhadra 2083 (August 2026)\nSource: https://www.nabilbank.com/interest-rate\n\nNormal:\n\n| Tenure | Rate |\n|---|---|\n| 3 months to below 6 months | 2.80% |\n| 6 months to 1 year | 2.85% |\n| Above 1 to 2 years | 3.00% |\n| Above 2 to 5 years | 3.25% |\n| Above 5 to 10 years | 4.00% |\n| Above 10 years | 4.55% |\n| Cumulative, 1 year | 2.85% |\n\nRemittance, a 1.00% premium over normal at every tenure:\n\n| Tenure | Rate |\n|---|---|\n| 3 months to below 6 months | 3.80% |\n| 6 months to 1 year | 3.85% |\n| Above 1 to 2 years | 4.00% |\n| Above 2 to 5 years | 4.25% |\n| Above 5 to 10 years | 5.00% |\n| Above 10 years | 5.55% |\n| Cumulative, 1 year | 3.85% |\n\nMinimum tenor: 3 months.\n\n### NIC Asia Bank, effective 1 Shrawan 2083 (July 2026)\nSource: https://www.nicasiabank.com/interest-rates/\n\n- Range: 2.75% (shorter terms) to 4.00% (five years and above)\n\n### Everest Bank, effective 1 Bhadra 2083 (17 August 2026)\nSource: https://everestbankltd.com/supports/interest-and-rates/interest-rates-deposit/\n\n| Tenure | Rate |\n|---|---|\n| 3 months to 2 years | 2.75% |\n| Above 2 to 5 years | 3.50% |\n| Above 5 years | 4.05% |\n\n## Benchmark used\n\n| Bank | Lowest | Highest |\n|---|---|---|\n| NIC Asia | 2.75% | 4.00% |\n| Nabil | 2.80% | 4.55% |\n| EBL | 2.75% | 4.05% |\n\nRange across all three banks: **2.75% to 4.55%** for individual normal fixed\ndeposits. Remittance-linked deposits run higher, from 3.80% to 5.55% at\nNabil.\n\nRates cluster tightly across banks, so this range is representative rather\nthan one bank's outlier. The lowest rate available anywhere in this survey is\n2.75%.\n\nA dividend yield below this range pays less income than a fixed deposit,\nwhile also carrying price risk the deposit does not.\n\nThe correct comparison depends on both tenure and depositor category.\nQuoting a single deposit rate would hide that choice, so any comparison must\nname which rate it is using and why.\n\n## Historical context\n\nDeposit rates have fallen sharply. In Ashoj 2079 (September 2022) individual\nfixed deposits paid 12.133%, institutions 10.133% and remittance deposits\n13.133%, with some banks offering as much as 15% on remittance deposits.\nRates were cut to 11% for individuals from Magh 2079 (January 2023).\n\nThe 1% remittance premium visible in Nabil's current rate card is the same\nstructure that produced those higher 2022 remittance figures.\n\nSources:\n- https://www.sharesansar.com/newsdetail/most-banks-alter-their-interest-rates-individuals-deposit-interest-rates-increased-by-3-digits-after-the-decimal-point-2022-09-21\n- https://www.sharesansar.com/newsdetail/committee-of-nepal-bankers-association-has-decided-to-decrease-fixed-deposits-interest-rates-for-the-month-of-magh-2023-01-12\n\nThe same check produces opposite verdicts in different rate regimes. A 5%\ndividend yield loses against a 12% deposit and beats a 4% one. This is why\nthe benchmark is read from this file rather than written into the code.\n\n## Comparison against the cases\n\n| Company | Yield | Lowest deposit rate | Verdict |\n|---|---|---|---|\n| NABIL | 2.31% dividend yield | 2.75% | Below every deposit product surveyed |\n| EBL | 1.37% cash dividend yield | 2.75% | Below every deposit product surveyed |\n\n=== CLAIM ===\n\nNabil declared 30% dividend this year. Bank FD is giving only 4%. Why keep money in fixed deposit when a blue chip bank is paying 30%? Long term hold, guaranteed income.",
+      "response_text": "{\n  \"verdict\": \"unsupported\",\n  \"assertions\": [\n    {\n      \"claim_text\": \"Nabil declared 30% dividend this year.\",\n      \"status\": \"contradicted\",\n      \"source_figure\": \"12.50%\",\n      \"quote\": \"Cash dividend: 12.50%\",\n      \"source_file\": \"sources/nabil.md\"\n    },\n    {\n      \"claim_text\": \"Bank FD is giving only 4%.\",\n      \"status\": \"verified\",\n      \"source_figure\": \"2.75% to 4.55%\",\n      \"quote\": \"Range across all three banks: 2.75% to 4.55% for individual normal fixed deposits.\",\n      \"source_file\": \"sources/macro.md\"\n    },\n    {\n      \"claim_text\": \"Nabil's dividend yield beats fixed deposit rates.\",\n      \"status\": \"contradicted\",\n      \"source_figure\": \"2.31%\",\n      \"quote\": \"Nabil's dividend yield of 2.31% is below the entire deposit range, and the share carries price risk a deposit does not.\",\n      \"source_file\": \"sources/nabil.md\"\n    },\n    {\n      \"claim_text\": \"Investing in Nabil shares provides guaranteed income.\",\n      \"status\": \"contradicted\",\n      \"source_figure\": \"Dividends declined from 48.00% to 12.50%\",\n      \"quote\": \"the share carries price risk a deposit does not.\",\n      \"source_file\": \"sources/nabil.md\"\n    }\n  ],\n  \"computed\": {\n    \"dividend_yield\": \"12.50 / 540.20 = 0.0231 = 2.31%\"\n  },\n  \"summary\": \"Nabil Bank declared a 12.50% cash dividend for FY 2081/2082, not 30%. Because dividends are calculated on the par value of Rs 100, the dividend yield on the market price of Rs 540.20 is only 2.31%, which is lower than the lowest surveyed individual fixed deposit rate of 2.75%. Furthermore, share investments carry price risk and non-guaranteed dividend payouts unlike fixed deposits.\"\n}",
+      "response_json": {
+        "verdict": "unsupported",
+        "assertions": [
+          {
+            "claim_text": "Nabil declared 30% dividend this year.",
+            "status": "contradicted",
+            "source_figure": "12.50%",
+            "quote": "Cash dividend: 12.50%",
+            "source_file": "sources/nabil.md"
+          },
+          {
+            "claim_text": "Bank FD is giving only 4%.",
+            "status": "verified",
+            "source_figure": "2.75% to 4.55%",
+            "quote": "Range across all three banks: 2.75% to 4.55% for individual normal fixed deposits.",
+            "source_file": "sources/macro.md"
+          },
+          {
+            "claim_text": "Nabil's dividend yield beats fixed deposit rates.",
+            "status": "contradicted",
+            "source_figure": "2.31%",
+            "quote": "Nabil's dividend yield of 2.31% is below the entire deposit range, and the share carries price risk a deposit does not.",
+            "source_file": "sources/nabil.md"
+          },
+          {
+            "claim_text": "Investing in Nabil shares provides guaranteed income.",
+            "status": "contradicted",
+            "source_figure": "Dividends declined from 48.00% to 12.50%",
+            "quote": "the share carries price risk a deposit does not.",
+            "source_file": "sources/nabil.md"
+          }
+        ],
+        "computed": {
+          "dividend_yield": "12.50 / 540.20 = 0.0231 = 2.31%"
+        },
+        "summary": "Nabil Bank declared a 12.50% cash dividend for FY 2081/2082, not 30%. Because dividends are calculated on the par value of Rs 100, the dividend yield on the market price of Rs 540.20 is only 2.31%, which is lower than the lowest surveyed individual fixed deposit rate of 2.75%. Furthermore, share investments carry price risk and non-guaranteed dividend payouts unlike fixed deposits."
+      },
+      "response_raw": {
+        "sdk_http_response": {
+          "headers": {
+            "x-gemini-service-tier": "standard",
+            "content-type": "application/json; charset=UTF-8",
+            "vary": "Origin, X-Origin, Referer",
+            "content-encoding": "gzip",
+            "date": "Sat, 29 Aug 2026 08:11:50 GMT",
+            "server": "scaffolding on HTTPServer2",
+            "x-xss-protection": "0",
+            "x-frame-options": "SAMEORIGIN",
+            "x-content-type-options": "nosniff",
+            "server-timing": "gfet4t7; dur=25631",
+            "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+            "transfer-encoding": "chunked"
+          },
+          "body": null
+        },
+        "candidates": [
+          {
+            "content": {
+              "parts": [
+                {
+                  "video_metadata": null,
+                  "thought": null,
+                  "inline_data": null,
+                  "file_data": null,
+                  "thought_signature": "Ev8mCvwmARFNMg8_KjcRFlWBFT9muT8KUtKr_dyGWhS1j_c1DMdGGC7k-KHdGuhzyiS5FkAVNPTUGOwLt0Pm-l1i95uPbWGluyN-qTohlFxiefzzuxt7D3K_lipVtSFNQN6IEdm6bzUwWP6ZFfm9i4umNF5lpjjf2gNyiOC4ed4eYWLYHaKMU02OPgy_9BbuYgrflVs-u8g4FmK4nhPFHH8hXZKU_34AYwsI51qsq-C2nXjGKU0Op5o73ONllPgoofQCN4KSRApW3ILMJOlTrKg6wdicyfeB6rn42l-dfz8nNGCcWi3h4BuoXa1YZ-Nq1dvCpqP7I4papJb5LjEeOKFb61SgeV8ViLRRsiV9OBk6RdvChO4XPFUiXr8uFCB4rhYY9RoyUeo23ZtYQRZEO9Yq1VxhLZ17tuXaD1XfLtnkFMB6ZLQH5OC9hhI0xOBlfrjfiDlOJeF0L7DRiGWmNI4jjOXbVLTgeRXwm--0NUwmrCvfBhhMA4Mz7iUFWqEluxvWXqf-7YqwavC90-xJ8g0-0ss8rx1G3k5RhNxgm7ntu2l7lgSQI88c-gsz3DFc3pWWnx5zZNkqTzUX2ngIoOzqN7HxDLsHksnXFnigNVWrI2ufQAmHMcSCcoIl5TDOMoeU57f6sq2syZpC7ag8ekAlVGV7kCmCdOnfCfNHW4eud_ey5WLWKUVJRdlGNOzQaoPCC-w1vGBjNt5IRYXFoBBOYwK6_YbSx8_E2FJ3O6OADw9u9QTadVTis6XAmwrgY5jAjgDST44k4uSVHt34ZPYI_-VlfOChwhIqlFDXPqTsG-qTbbXhYukHjuLmC0W2mdjF5ryflCiyPZACaDF87DsW5MnwktOwZ6cUs4YbNfu2Wz4jI10d-9_YydG-unI-VoTvG5qjS89lOoWrCLqfYcfPj_0EubAeXxeVc606pxaHK_RpTPIKlLsn53O0lI0ESKwwaz7NLRy0lx5iBhhe3qdFSL3YuLX3fe5GKqwDSTLYRb_sFFn9t_sSOMmqkt3bm5162rVe6BgKU04dn0GgpvBZDb1IQZoYBJiYiwNCc-HWfau1euvLsL9tk47v4KvSJ4OQA6NhcaeVjU_ayGy1piO2eeemZ8-sVHNCu9r8O2Ns-CIb-wGwUSOVrTMUWgPh_2gJC927sd1gizzz3i1GBY7mViLtVkpNt7yYByk_9R7A_4radcVRXmCUSNMSRdT6U7v7uM0f3foXR6qkTwd4kR6Byj0r8WFS4HBXTuiTBRJXbv46Gr8TOSTU-O-MD2MGj8jG3rgKzHQH0ZrfXGygtibAaMimjwKKm2lPfxEsmxSh-681ltkKQC-ZN54JqgCdFxlkTT7rO6h6pZp50dOi1t699S0pTrrwCAkLwfW20qFi2HSDp8lBLmY5P-dm7f2jXN3lIDolWSFqK2KocgbXzvC4RyUmxYV0PW21NlOesMeDUwQ7IeWe6qQ-XA4_p9dVbj07Bh7QwLAnPLPGrCuzNWzKTZRWPn3pSjpJrV4Jx06KOQIsTzOKy3NlWjc2l09aCIBcLiAwKDcGrKsLbv7k3QuIk6K9q0ToxjmktlIiMNTWB4hBsUByYMwfeb2BPwHptR-P551etP-Qoz_MnnppRKCKwt1fhdefsvvxphTj-mLXw-XZfHMDGP1mMgC5QLa5YEJ4qoNm9bIDr689bNt5PAEbVpxsKgEZXPgo7pxxhTGket-KoZwFjtMaM6qHdJ2YmZVK6UxPs1sE8eZojbPyz9WHS8boVTzT0F2kb2v8WoZe1juh7vHmOXrQGb7lgoef_3WeHKlp6NS5NWCxJLim4aWbVgyggtdIFFsdZzOHoTs5yxR2nRkf6XNYL4i1fATNwtmk9cBRC6qLvJZzZc-1AiIAAyXjtTgRrmTJCXigk4gnXmbe6H9Pt_w9zl1SP01YI0kPDRfX5PW8cWS2GzYoCm1VTt2LEv8w1OZi3L1Zxnjc9PhIApzCaSQUNcfnjJtBTGzbjUoqwdHJ1va6xCUuKygSuA7n_5uUWzmFmQTnOSLX0kQmT9bttTPGW5t7PpS8CWP6OYmn5sMHG8m_WTAMPLO7ifXwAntLPpzksGwTl1TvLymnspfrSElkSfKffSseBe0eABWGqWQj9SZlrCoxCEVxFhat21Sdd0JlRhOY_sUxVrg_yQcC-2TmQIgm3QBWwNaQLRQXZg07Pfua62Cn7Z11oVK_XpWxkXQ4c7twA4gz_mEb0NIMJeXMO2TxxDq0DwQNKerba3j_AjwNR9UcsiVWo8JXw2ZxPVq5_5W0ed31M5UhlnZjREbezbTegPHs7P17p7zb5sWFksiIIdab0fHkcB4s5pDBqsyD_6ubZeN0iwgbQMKUIJL3HdVS78TJ5wDuGfdLII40yj1nJShLoeoUGsPhC-Kke0lPtm__-8KmDpihtcdZTp2wDyaooQ4FY3-F1eo5JzTaoXAKztg2O6aYMIuLRSNl5pgF1j8UJVcgpdsED-i4VCJkR-wNlmmhd6DuQY_Ynbdnhr5JiNcif-EbI0JO6mlg_SdR4rJxLRSiF1OIBwq5E6InZFregEso7tFjvh7IaVKBj7ie4swmmjuQ41b3sXH-pLIcrKxs2M82Vins7_EXPhUPALRlUyxNQChT5-_AiGaaALofUBoT_XEqXDG3Pqj9TmdBt6FH2TAGgwy5u036jl6rp8ZuQN2QuOtBMLYV6jh5bciRpNeL3fGHfq2TWQerFeHOtms91dbaLA3OiZ39Xs3hyALLN3J-UAIZYViEEUVPwDPhDLDFW8QmEBzFvMB-XTTIe2p9uyHYT0OJnfccyURIordrUdD5JtT6O6NUJWCT-CVEvma2JGGUyvYw3o8PoH7UIShrEa_oF58SfKxw_I8WkHa-6i-gp0OReU2RPOshyuft7YgDHHtAknYvkX1tfjDXxKSbQ0DhUdYiLAYjd98EF4nGKL_wgv4NluPhc7RDDCT0-Wx80kVMOkyrnxlgzNMrUAbCGigbblQHbY4eMIXvxJp9rwmp23-XKaqN5dy-5NaNXFRojCyVEv4mxh7x3bKCZWjdoBj9V_TNc3BSlY-wp7rd-z4ODnQZs8335aXs_lZafEOFjAY19H27bGu2zxyzBr9UtJajKwkhzjS2UhF2W3bbWp9Nxs4M4sjrwQRgrfn0wHF--XvAV5qJ3E_jbzlP9gZqZCWrDGol5QA5HDTWTgKFyVoawuY0Rhj3AsHDbOdUJzUzCFb-qoNbgEh901irkgq-9zto5juGHMBlFTbJkRJJs8ilJSU4WB0lZ2j--hpo5d7UR-bayTJSzNEOJa_BY-tvL10noQCMmlnnjkEspjv9DzRXoMt879JekfyuO-VHQORX9Ey1Dh8Pai3EHfA_o3nZrYgIfKMAxL2x1pNa7Yf9fPWW06UZ2HE2ao9Lnm_DbLEVTwQ8VVkxt8yTHRDJd3Zdo2JIMyinO4ij5-rOwsYEAQUNwdoif0IMeKJHdf3ITJX1iwG-Q48A4dB4J4xHQKXeoG2oWXPqHMVmOhC4RwoXBV7_UkaCD2UXeY_VsPCHz0auLUvu56ZOhnNfCrk5vNs_29aRNE7i-cPBOw8zKYaFm-uEps-5GUx2IhvDDgQ7TR2FaTili93Mp0qxxGd2FTgcI3ET9OTyMkzaBHLRPfueo6_soQEtJ1y_Rk_bvAV5RjqFJ7FQgXCXooizickYjcC4mDMMKAMh-O2afBm-oJdwL4f5CaqI2dt1FVdA85x505dYBWDtt51VPi8VPPYMNVpFVYO68woL3tq5EvMNJ8STiYWrNVKRLiZuiaXHPdGZe8rERjGzmOnG4-x_LRYCRDi3u26myNrfZHUY58OF007xdpwF2BTE-7SAIpf_9nzmZSUwo-GNj1DJDYYNWv9dmNmvy0j1aD9eqa5MOGV1_TCl7UMxNSIiW5i5fr-nmk_yrNW1aE5i-sWFeXvmOrffV4I28n7BfvU6hC4Ddy7geRvYy8rJeOcReoBQVchd-4RaqS1j56xCWDP2zP0jDcR6ISVxZ8HvaL2zHpB8VmCkU-SaP-atALiVomDxRmv90sXJXuiT2TPP6zUoSH_dB7uU6H54OnPUxVi_60OEttUFlXu3VwbGH74nfDv5Qv22MwnPcR6DTQkHCP26vRTn6cRuRhwO83rpqh8CO13VZqQgAiuGt2Y6fYvLZBxICBOL1Fbs9x2voWqSuNKaQIJ1GEZwTnF6mCeo6DoRM-2doqBkhDARVDefI7sr3MkhG1ZycVDsj4iC4rrKWXHs1xY9zMECJl4ThWGsqIt7G1x0aZF7DyHzsBxvA4XCiawGAZT6EFI9WY3YI3vrFfmeDr1Nkn3UendWSEQZO5PWqbqLIM9BkpW575piK_NXji0b5Ra4Ul8jZ1RTq_b0Ha_jHzYvAuSOdYcYbr1N0WJK6y5RwPArMFADBxI9TlwolDHYBEZo-dajsr3XBgitQWESLNfLYZOSXhMn__1q-J9GCG7PlkeM8Ed0JE5lijtDHl4-EAYvUzfWvE8e-SP9ENeLny30N_cmU2RTq1bVjbYAHxnaO-ENf9aGBke3vQtdEzPJibF4N6sVLYZSikCJYDIRjL8IzUWKM4XH0BpEFNoVCEBS6yH78Ta-oF0JsGX-foibNr7r2rAJ0uGnl9dlOHysD-6RNNNYFIFfkr3rnXcm2TVEqD6ess4Ws2j2OUeVhVHoDbCQ0-N2N4sOPjjS6H9Ws2scaq_Otsz_M5lndfa4U5ticLV1OeyP_UDs5P52YlpVFrESQ7go1zcZfdHgrX9cmj0mZ5TySIeQauG3OjVL2em3ncRlz3AWbZ00jjs8tFjufUgxPcnVZQBd_yZK6eksoGVCAexn9WHCUIDFugEZxTkhOR6J-8l64g7BMyhx8nqErfzvf1YY-BMTI3Dofvp-fb231WTfDTXXdBEXGBVQRmNbTL4GxP6v2yZ6jqsygwEpiS-JeDhK68XGZ_83uORDOn-tou03nG8d0Bad0fo1_eFojYYsagaky_MQI7HKPWl7KiBBXQqtZofXZ68fYuw3OBi701f9Gzy-8w_ppSLnsHEJaLHYDcxCfdrVB3SaZTzwps6jxYZJsujxOoIjA1XbiSkCJqmkRlfHrD7jmeLepGGPebU7e1kQzAAlkXQe55WAkMeAWZYR5stSyTNdmkw8rlVqFm0u2AgMIta6WcR1oGQGsbczIC0Rj4t_Jk9ZNAOfDoyfSSwkWFOA1H31l9CWrdudIfzmfgmJsjO9d2J78ybk7r0pLfV0WHY4JFyrVMQ6m2G4YKhVvucDuQWzMQY6o3zNRheZLLxMzFMLH3ChkYtrlBlPy4AFR-ZCyabvWn9aplyRXIkyeTl6jlJd0B1P7xvFa4BZfDXraIJhVhxW_AjVUwnAnm9yaDW0rh6Ly6h1Y9ujWfB8BTtpAAXygfm7aI6Oxwe8TrO50bUi7DHgu1pklc_nwjE2NWpS3n6jsj_mOrkcOSZ70vmBn9j-21lu48dLrZSfONX6QRmAqgJgET_mL6JIuXx8IKxZwJspF-MPmP4FZpNuXHmjXK5WBVnRPRfa6MuMBqNdXQkLsymnGNygFx1bHTW18yI3vIeHNsQs3dKR7yJ61tZEke5-LiNnJUT4TG5QUZNuqrkePqu-v3Jn4Vkr2oHrAc6EEseRe8hzj6EHkyXWmrpJI47dvP5lAJyc8qHN1jselElai1VAxejRP6sFlzfDOiRDjXmqHCg69v9bPf4CEYFKnpx47lxkyq0qYlLO4xX63Yx5NIzKfvY0TXqpyAv78ghLEd3do9YHS9usX1OuklZqvQLnSwHJXWjOGvvOqWFvwe8J-vcrpWM_jkTwKD9D9qwgex32Uu14-hfcR2k_9HN_GqyMXQJKuQ7B0Mt7RhjluBqB0Giqu1bSU2mT_q-MoYlNjnUhzjVMqVAeFx8ifbKiBhPWbHjGS1YP4kEv5pSbhkOcOcnj6gUiwZH440AbDm6QNN1htCNpYJMZkRmj0mkDP6q6-YluKiG3vJGSWtSQ2NoETxvZGC9aWBx7ScvV4StCTDnSGqlodhaEQm0ORcrnX9Cv-vKlaKjYCFS1X5ONilkOaeWtV1STjSUw0W--uwE7oh37j9WHuBTYs0RJnLtPMurl1yF6zPpHpZfo7NNXNKFQdtbMKZSd2E8Vnw9ExyTg-UvphAe7zJhaBMyyXl7OYuqraj9EdLdvCDYU7ai2zch8UPiCK0ebHIgeqczReUZGeQUOVodAf0zkd_7OtlOe9edvQA-BlgK6ykAOphGt1NXQzhxU4vzA1gHspWBqOEDBTvASBB4pTZc3p05N0-sq0Ebb1MInxZO_3vMfPeJH20BDGQSnAAzplgh-2zjmOV24aSaly5gu_Uock4cjCQyqrHLuSa5THfarmed4CNmQyxWa57aANcLfS-wrmjHUdMhDvwJZwh58YxkMR7x1TKkcSRbiRxO8K53Z5_Zc455RggGVn-dRAX_VOisqGvXAPD9MquCNnI43ye1itvjgGzt5AFa-1vUwWs-fOpAgtcUUiFWTrCChVgUDNyQnfm7RgaKm8iQhemP2_TGX5rfN3SMXD7Flu5p_zw_f1cXExM6_nqJH3hj6EutQCG4bs4yK1OGbxsl3-EaSLX2rz6GTwefPpt0llY8w8o6rEJR-J7iqgKPzijeR6TkUKbKGHqWyVO6CmOM=",
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "function_call": null,
+                  "function_response": null,
+                  "text": "{\n  \"verdict\": \"unsupported\",\n  \"assertions\": [\n    {\n      \"claim_text\": \"Nabil declared 30% dividend this year.\",\n      \"status\": \"contradicted\",\n      \"source_figure\": \"12.50%\",\n      \"quote\": \"Cash dividend: 12.50%\",\n      \"source_file\": \"sources/nabil.md\"\n    },\n    {\n      \"claim_text\": \"Bank FD is giving only 4%.\",\n      \"status\": \"verified\",\n      \"source_figure\": \"2.75% to 4.55%\",\n      \"quote\": \"Range across all three banks: 2.75% to 4.55% for individual normal fixed deposits.\",\n      \"source_file\": \"sources/macro.md\"\n    },\n    {\n      \"claim_text\": \"Nabil's dividend yield beats fixed deposit rates.\",\n      \"status\": \"contradicted\",\n      \"source_figure\": \"2.31%\",\n      \"quote\": \"Nabil's dividend yield of 2.31% is below the entire deposit range, and the share carries price risk a deposit does not.\",\n      \"source_file\": \"sources/nabil.md\"\n    },\n    {\n      \"claim_text\": \"Investing in Nabil shares provides guaranteed income.\",\n      \"status\": \"contradicted\",\n      \"source_figure\": \"Dividends declined from 48.00% to 12.50%\",\n      \"quote\": \"the share carries price risk a deposit does not.\",\n      \"source_file\": \"sources/nabil.md\"\n    }\n  ],\n  \"computed\": {\n    \"dividend_yield\": \"12.50 / 540.20 = 0.0231 = 2.31%\"\n  },\n  \"summary\": \"Nabil Bank declared a 12.50% cash dividend for FY 2081/2082, not 30%. Because dividends are calculated on the par value of Rs 100, the dividend yield on the market price of Rs 540.20 is only 2.31%, which is lower than the lowest surveyed individual fixed deposit rate of 2.75%. Furthermore, share investments carry price risk and non-guaranteed dividend payouts unlike fixed deposits.\"\n}"
+                }
+              ],
+              "role": "model"
+            },
+            "citation_metadata": null,
+            "finish_message": null,
+            "token_count": null,
+            "finish_reason": "STOP",
+            "url_context_metadata": null,
+            "avg_logprobs": null,
+            "grounding_metadata": null,
+            "index": 0,
+            "logprobs_result": null,
+            "safety_ratings": null
+          }
+        ],
+        "create_time": null,
+        "model_version": "gemini-3.6-flash",
+        "prompt_feedback": null,
+        "response_id": "LZSSaqjsCvj5juMPqZ-22A4",
+        "usage_metadata": {
+          "cache_tokens_details": null,
+          "cached_content_token_count": null,
+          "candidates_token_count": 544,
+          "candidates_tokens_details": null,
+          "prompt_token_count": 2934,
+          "prompt_tokens_details": [
+            {
+              "modality": "TEXT",
+              "token_count": 2934
+            }
+          ],
+          "thoughts_token_count": 1732,
+          "tool_use_prompt_token_count": null,
+          "tool_use_prompt_tokens_details": null,
+          "total_token_count": 5210,
+          "traffic_type": null
+        },
+        "automatic_function_calling_history": [],
+        "parsed": null
+      },
+      "error": null,
+      "time_taken_seconds": 25.844
+    },
+    {
+      "id": "case-2-nica-bonus-share",
+      "company": "NICA",
+      "model": "gemini-3.6-flash",
+      "source_files": [
+        "sources/nica.md",
+        "sources/macro.md"
+      ],
+      "prompt": "You are checking whether an investment claim is supported by a company's own filings. You are given a set of SOURCE DOCUMENTS and then a CLAIM.\n\nWork only from the source documents. Then return a single JSON object, and nothing else, in exactly this shape:\n\n{\n  \"verdict\": \"supported | partly supported | unsupported\",\n  \"assertions\": [\n    {\n      \"claim_text\": \"the specific assertion being checked\",\n      \"status\": \"verified | contradicted | not_found\",\n      \"source_figure\": \"the actual figure from the source documents\",\n      \"quote\": \"the exact line from the source document\",\n      \"source_file\": \"which file it came from\"\n    }\n  ],\n  \"computed\": {\"any calculation performed, showing the arithmetic\"},\n  \"summary\": \"two or three sentences for a retail investor\"\n}\n\nRules:\n- Break the claim into its separate assertions and check each one.\n- Every figure must come from the source documents. Do not use general knowledge about these companies.\n- If a figure is not in the sources, mark it not_found rather than estimating it.\n- Show the arithmetic for anything computed, e.g. \"1200 / 40000 = 0.03 = 3%\".\n- If \"computed\" has no entries, return it as an empty object {}.\n- Never advise buying or selling. Describe what the evidence shows and stop.\n\n=== SOURCE DOCUMENTS ===\n\n--- sources/nica.md ---\n# NICA — NIC Asia Bank Ltd\n\nRetrieved: 29 August 2026\nMarket figures as of: 27 August 2026\n\nSources:\n- Market data, annual and quarterly results, dividend history:\n  https://www.nepalstock.com/company/detail/139\n- Dividend history, independent corroboration:\n  https://www.investopaper.com/news/dividend-history-of-nic-asia-bank-nica/\n\n## Market data\n\n- Last traded price: Rs 308.10\n- Previous close: Rs 308.00\n- Day high / low: Rs 310.00 / Rs 305.20\n- 52-week high / low: Rs 411.00 / Rs 304.50\n- Open: Rs 306.00\n- Total traded quantity: 36,729\n- Total trades: 172\n\n## Capital\n\n- Sector: Commercial Banks\n- Listed shares: 149,175,670\n- Total paid-up value: Rs 14,917,567,000\n- Market capitalisation: Rs 45,961,023,927\n- Implied par value: Rs 100\n\n## Annual results\n\n| Fiscal year (BS) | Net profit | EPS | Net worth per share | P/E | Paid-up capital |\n|---|---|---|---|---|---|\n| 2079/2080 | Rs 4,444,769,821 | 38.44 | 254.16 | 20.65 | Rs 11,564,005,366 |\n| 2080/2081 | Rs 701,497,630 | 4.70 | 197.88 | 94.25 | Rs 14,917,566,922 |\n\n## Quarterly results\n\n| Fiscal year (BS) | Quarter | Net profit | EPS | Net worth per share | P/E |\n|---|---|---|---|---|---|\n| 2081/2082 | Q1 | Rs 110,526,690 | 2.91 | 203.79 | 171.50 |\n| 2081/2082 | Q2 | Rs 151,730,287 | 2.04 | 198.92 | 185.11 |\n| 2081/2082 | Q3 | Rs 156,775,959 | 1.41 | 199.30 | 266.64 |\n| 2081/2082 | Q4 | Rs 161,573,233 | 1.08 | 197.30 | 387.82 |\n| 2082/2083 | Q1 | Rs 122,160,863 | 3.21 | 198.74 | 97.73 |\n| 2082/2083 | Q2 | Rs 131,191,673 | 1.77 | 198.33 | 188.44 |\n| 2082/2083 | Q3 | Rs 140,324,168 | 1.27 | 172.97 | 292.04 |\n| 2082/2083 | Q4 | Rs 181,702,469 | 1.22 | 172.32 | 266.90 |\n\n## Dividend history\n\nSource: NEPSE (Bikram Sambat fiscal years)\n\n| Fiscal year (BS) | Bonus | Cash | Total |\n|---|---|---|---|\n| 2081/2082 | 0.00% | 0.00% | No dividend |\n| 2080/2081 | 0.00% | 0.00% | No dividend |\n| 2079/2080 | 29.00% | 1.53% | 30.53% |\n| 2078/2079 | 0.00% | 0.00% | No dividend |\n| 2077/2078 | 0.00% | 0.00% | No dividend |\n| 2076/2077 | 19.00% | 1.00% | 20.00% |\n| 2075/2076 | 10.00% | 11.05% | 21.05% |\n| 2074/2075 | 10.00% | 0.53% | 10.53% |\n| 2073/2074 | 20.00% | 1.05% | 21.05% |\n| 2072/2073 | 26.00% | 1.37% | 27.37% |\n\n## Verification notes\n\nTwo independent sources agree on the recent dividend record. Investopaper\nreports in Gregorian fiscal years, NEPSE in Bikram Sambat. Mapping:\n\n| Investopaper (AD) | NEPSE (BS) | Dividend | Agreement |\n|---|---|---|---|\n| 2022/23 | 2079/2080 | 30.53% (1.53% cash + 29% bonus) | Match |\n| 2023/24 | 2080/2081 | No dividend | Match |\n| 2020/21 | 2077/2078 | No dividend | Match |\n| 2021/22 | 2078/2079 | No dividend | Match |\n\nCalendar caution: sources for this market mix Bikram Sambat and Gregorian\nfiscal years. The same period appears as 2080/81 in one source and 2023/24\nin another. Any comparison across sources must reconcile the calendar first.\n\nNote on source framing: the Investopaper article describes NIC Asia as having\n\"provided consistent dividends to shareholders.\" The company paid nothing in\nfour of the last five fiscal years. The statement is defensible across a\ntwenty-year window and misleading about the present — an example of the exact\nfailure mode this project addresses, published by a financial news site rather\nthan an anonymous influencer.\n\n## Computed\n\n- Price to book: 308.10 / 172.32 = 1.79x\n- Net profit change, 2079/80 to 2080/81: -84.2%\n- EPS change, 2079/80 to 2080/81: 38.44 to 4.70 = -87.8%\n- Net worth per share, 2079/80 to latest quarter: 254.16 to 172.32 = -32.2%\n- Price against 52-week high: 308.10 against 411.00 = -25.0%\n- No dividend in the last two fiscal years; none in four of the last five\n\n## Cross-checks\n\n- Market capitalisation: 149,175,670 x 308.10 = Rs 45,961,023,927 — matches\n  the published figure exactly\n- Paid-up value / listed shares = Rs 100 par — consistent with NEPSE convention\n\n## Not yet sourced\n\n- Any disclosed bonus share announcement for the current fiscal year\n\n--- sources/macro.md ---\n# Macro context\n\nRetrieved: 29 August 2026\n\nThis file holds the benchmark rates any dividend yield claim is compared\nagainst. The benchmark is read at runtime, never assumed.\n\n## Current fixed deposit rates — individuals\n\n### Nabil Bank, effective 1 Bhadra 2083 (August 2026)\nSource: https://www.nabilbank.com/interest-rate\n\nNormal:\n\n| Tenure | Rate |\n|---|---|\n| 3 months to below 6 months | 2.80% |\n| 6 months to 1 year | 2.85% |\n| Above 1 to 2 years | 3.00% |\n| Above 2 to 5 years | 3.25% |\n| Above 5 to 10 years | 4.00% |\n| Above 10 years | 4.55% |\n| Cumulative, 1 year | 2.85% |\n\nRemittance, a 1.00% premium over normal at every tenure:\n\n| Tenure | Rate |\n|---|---|\n| 3 months to below 6 months | 3.80% |\n| 6 months to 1 year | 3.85% |\n| Above 1 to 2 years | 4.00% |\n| Above 2 to 5 years | 4.25% |\n| Above 5 to 10 years | 5.00% |\n| Above 10 years | 5.55% |\n| Cumulative, 1 year | 3.85% |\n\nMinimum tenor: 3 months.\n\n### NIC Asia Bank, effective 1 Shrawan 2083 (July 2026)\nSource: https://www.nicasiabank.com/interest-rates/\n\n- Range: 2.75% (shorter terms) to 4.00% (five years and above)\n\n### Everest Bank, effective 1 Bhadra 2083 (17 August 2026)\nSource: https://everestbankltd.com/supports/interest-and-rates/interest-rates-deposit/\n\n| Tenure | Rate |\n|---|---|\n| 3 months to 2 years | 2.75% |\n| Above 2 to 5 years | 3.50% |\n| Above 5 years | 4.05% |\n\n## Benchmark used\n\n| Bank | Lowest | Highest |\n|---|---|---|\n| NIC Asia | 2.75% | 4.00% |\n| Nabil | 2.80% | 4.55% |\n| EBL | 2.75% | 4.05% |\n\nRange across all three banks: **2.75% to 4.55%** for individual normal fixed\ndeposits. Remittance-linked deposits run higher, from 3.80% to 5.55% at\nNabil.\n\nRates cluster tightly across banks, so this range is representative rather\nthan one bank's outlier. The lowest rate available anywhere in this survey is\n2.75%.\n\nA dividend yield below this range pays less income than a fixed deposit,\nwhile also carrying price risk the deposit does not.\n\nThe correct comparison depends on both tenure and depositor category.\nQuoting a single deposit rate would hide that choice, so any comparison must\nname which rate it is using and why.\n\n## Historical context\n\nDeposit rates have fallen sharply. In Ashoj 2079 (September 2022) individual\nfixed deposits paid 12.133%, institutions 10.133% and remittance deposits\n13.133%, with some banks offering as much as 15% on remittance deposits.\nRates were cut to 11% for individuals from Magh 2079 (January 2023).\n\nThe 1% remittance premium visible in Nabil's current rate card is the same\nstructure that produced those higher 2022 remittance figures.\n\nSources:\n- https://www.sharesansar.com/newsdetail/most-banks-alter-their-interest-rates-individuals-deposit-interest-rates-increased-by-3-digits-after-the-decimal-point-2022-09-21\n- https://www.sharesansar.com/newsdetail/committee-of-nepal-bankers-association-has-decided-to-decrease-fixed-deposits-interest-rates-for-the-month-of-magh-2023-01-12\n\nThe same check produces opposite verdicts in different rate regimes. A 5%\ndividend yield loses against a 12% deposit and beats a 4% one. This is why\nthe benchmark is read from this file rather than written into the code.\n\n## Comparison against the cases\n\n| Company | Yield | Lowest deposit rate | Verdict |\n|---|---|---|---|\n| NABIL | 2.31% dividend yield | 2.75% | Below every deposit product surveyed |\n| EBL | 1.37% cash dividend yield | 2.75% | Below every deposit product surveyed |\n\n=== CLAIM ===\n\nNICA bonus share announcement coming soon, book close date is near. Buy before the announcement, price always goes up after bonus. Basically free shares.",
+      "response_text": "{\n  \"verdict\": \"unsupported\",\n  \"assertions\": [\n    {\n      \"claim_text\": \"NICA bonus share announcement coming soon, book close date is near.\",\n      \"status\": \"not_found\",\n      \"source_figure\": \"Not yet sourced\",\n      \"quote\": \"Any disclosed bonus share announcement for the current fiscal year\",\n      \"source_file\": \"sources/nica.md\"\n    },\n    {\n      \"claim_text\": \"Price always goes up after bonus.\",\n      \"status\": \"not_found\",\n      \"source_figure\": \"N/A\",\n      \"quote\": \"N/A\",\n      \"source_file\": \"sources/nica.md\"\n    },\n    {\n      \"claim_text\": \"Bonus shares are basically free shares.\",\n      \"status\": \"not_found\",\n      \"source_figure\": \"N/A\",\n      \"quote\": \"N/A\",\n      \"source_file\": \"sources/nica.md\"\n    }\n  ],\n  \"computed\": {},\n  \"summary\": \"The claim that a bonus share announcement and book closure date are imminent is not supported by the provided filings, which list any bonus share announcement for the current fiscal year as not yet sourced. Additionally, NICA paid no dividends in the last two fiscal years (2080/2081 and 2081/2082). Statements asserting that share prices always rise after a bonus or that bonus shares represent free value are unverified by source data.\"\n}",
+      "response_json": {
+        "verdict": "unsupported",
+        "assertions": [
+          {
+            "claim_text": "NICA bonus share announcement coming soon, book close date is near.",
+            "status": "not_found",
+            "source_figure": "Not yet sourced",
+            "quote": "Any disclosed bonus share announcement for the current fiscal year",
+            "source_file": "sources/nica.md"
+          },
+          {
+            "claim_text": "Price always goes up after bonus.",
+            "status": "not_found",
+            "source_figure": "N/A",
+            "quote": "N/A",
+            "source_file": "sources/nica.md"
+          },
+          {
+            "claim_text": "Bonus shares are basically free shares.",
+            "status": "not_found",
+            "source_figure": "N/A",
+            "quote": "N/A",
+            "source_file": "sources/nica.md"
+          }
+        ],
+        "computed": {},
+        "summary": "The claim that a bonus share announcement and book closure date are imminent is not supported by the provided filings, which list any bonus share announcement for the current fiscal year as not yet sourced. Additionally, NICA paid no dividends in the last two fiscal years (2080/2081 and 2081/2082). Statements asserting that share prices always rise after a bonus or that bonus shares represent free value are unverified by source data."
+      },
+      "response_raw": {
+        "sdk_http_response": {
+          "headers": {
+            "x-gemini-service-tier": "standard",
+            "content-type": "application/json; charset=UTF-8",
+            "vary": "Origin, X-Origin, Referer",
+            "content-encoding": "gzip",
+            "date": "Sat, 29 Aug 2026 08:12:01 GMT",
+            "server": "scaffolding on HTTPServer2",
+            "x-xss-protection": "0",
+            "x-frame-options": "SAMEORIGIN",
+            "x-content-type-options": "nosniff",
+            "server-timing": "gfet4t7; dur=11360",
+            "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+            "transfer-encoding": "chunked"
+          },
+          "body": null
+        },
+        "candidates": [
+          {
+            "content": {
+              "parts": [
+                {
+                  "video_metadata": null,
+                  "thought": null,
+                  "inline_data": null,
+                  "file_data": null,
+                  "thought_signature": "Ep8jCpwjARFNMg_8oRw8gIHLl11O7j_Ud_7utJ6e5TkeQVdJIPe1tpElcfFdv3ms45mrETHoBZfbfAmu1qEAclpUrkaP08mDR5kmAtGnEGJ4ZLnLusYgL68VD4DF24D1VufB3BMOb2NcY7hiRdCfCfv77vUv_jfb1ewE9yKn6f0Uztm84dsS4yAJga94oH8M3dfKzPBX1mortbokvbju_CZUyoBuafPnyorobFUemZd_rUSfVSdqJTkrWTZveO7JBxGLAo0K2GO7CDuSkn1kFBClRwNB5Ra2w8jJJ7NaSg-slWYg05RvqDUpVkNMxpD2KuURkRZuyHthtN24cit_iGzh2-uFQDJFFV_oR2MyCPJqg_LWjuuTa-cTjC-DzZ7_-mocYrehLlVIPt4P56afNtfmF-Hp1aUNRAqCbYd9RI3bvURO1paFJSOfjAcnl2tyW08Zf5YMTQML0w37yfXVzjKYk0Q73nuVzkwyfqf5Va9t5Br25_0PsRwNlE2SJaEBo-a2qX2NXD18eMlXC4iA2Rf4X3hVs-d2aqiXwVd6GQ-ANvw0IqIGctSkXdyyfq-QThlBON2q7MdxAPy1tOP5MVBtvSioFdphFeEzDi4I6K-W7DY9AV8GPomw-0xX_HARbSh_DwHSIAV7Rn7_KkY90jQ-GDORllaxWki6Ek992ol6RYtShZgDCL-MYkacdaplZLI1k6M5xTRRQn5dD-ar9SNsEh1j2KpskTt7s_CN0ogu2JUiFE31D0BJi6H7zDvoHeeCwe5KS7JygJWepMzYBO8oQVFz3FRvotq3aoBoFKtuvwgkO-SeaRpMvbT7aEOacx0ULAR_f1-jSwXREgbGZQGR8u8LyIJZy3qj5S0BugDVg3w53o8nKaF4mnTZS0TNBp_tMLofRT1bfs-_a7O9HxbDFqIIyNfs5Gn-DxuWi2-pcN5ktMzjDZbDaHE0ESEIeZXTdWB_nUPd0rNBmoYWQ0t6NEsQvDtwlC2qMCC2wDbL6grENTdxOBD7XWJFQMRShq725Sdml0tdT23yf5CIV__Cu2aKTqGqhkAUMvq-HDEGx7BGKJ3itoz1YxydaA0Q19F5Pa5DWa8SLxpfGpzlxdMu39r0i81YyrlXuM7_xRgZzVLNXXjydtXog6793womBoiTTd0dbGKNvqTWvY66FnzJBQIkRJe5GoXhwDNYDuHm2xxzMpLmqDRMhNx5koZjhN08kLKM7EsmOaWJNHuZbx2M1WFs5JoI_S3y0ouSLjeUcHFgOV_CYHAtvLjwTwTL7vmCQiUm16GFZtgZapexHwmSyfptfgm_f70WDQ1k9mkGutT-AV7jZc4Z1J-qZ_evwEkdKm9vCrC8Y_OoXrgfs1SNKG6a6OCmqiF2QAWwxoY5jKkozmJSVQg298zoGSmZvtj42ME1XYc8KbK8jZ7EEGRF4Em31Q3lRqTYB4PJFQyjRXtZn9mbfr7RvTumqwbQ9KrKmnJ5egRIrQgSzFB6ENle0r53AdvVusKzUdTuppmlGbLoclOxPTLx6Qfr3fDanjBi8FtFg3dvZxxyTtn9rNvuX0BZZYYoM2NS8V-bDK8QiDauqff6qbkHgy2PcQF_Yke-DeeGW89OE2vnP_ZC1Mo9JRS61394W456xcUJ-hPKexC0czHIIOPan6jswcPQCl5wAXzV1MtLQtcGt9L74NZ_YOzzlOb1e7d-Ej0E5dYUHy0nbB1vHc2HHyRjy6Vp4oLcPDOQ9IqMw4HTkoMLOG8srhlq1_oWC5-bBW9d3WPirWWB1NAjhxgmZKHK95K_RUrcyzYfbEmWB-AqR9AXrP-jbexaRIPI3-bS-8gPNmUSGkVZgRZkwDCINDCMLwBndOuKiFyuAg1iL_yld3Pnd2GC3wMvQ19QO5Ro6cYWLWqHjqri7tIwkY_1b2tdNN4SVYF2khFPd1NVmMEw3ypKgzx8w9VeZXRUY18qTiAGxYzajtltH99DVP7lZxsURI4K8pgFkHpA7FVlO5qBevCF8Vp3qMo7Seb-mAFahPt43zhBG89Zwl_kcaT6sORP9_BrDLxpT_2yg9A7CranqYvfHIj_Ea3oJVPY7q7P7ewPuUepIeHNo9YEO5jcogftg-Yh9AQmKNgc3KSTXnLQgIVZJ7RV0n2oodEEjU7l0uRb12bjEIWbYIMiv0nIbpv9J2LDCnGi6_WUl47Ez2-_u7Wjb0Ywf78-8xou65cI7QXmheAMf-imSb8RqFBYR7yUKdKjA6q-9_4xlzr7kEKtDnycERbFRRK3EIYXKLGINYDo1r9yCzwzH5QeBb1vbaGvFa9JHUU6OyQEbBN2u4Bu0bmFTBToQSndQcDERFHZ2tHTEJmkIhqXZrhL0SOSlxHsMoQ10J0U45xIyEeiJcJf6E2s6nrDaChCMyXo8Dp3Ic1BJyK3HfLIFa-D8e3b_cQIy5qDklYCVEKc8l1bpa-TWTQl7zzWWSq3UlVFVC7ejxz3c6hMxRglCFfNCqfzIj8bjyreyB3MqnTvK1q87YQOrMZryS0Vpm_vSTfE7-6VlNkiBwHYAQ05smWF7x5jWnaeckWkW9biSNzfTRwXEyWXcrmoWb90dTO0QXUkWlDNyOq_Xmfd0W4eBKitNHWlgTgJKsuEacR2_OLuzeagJAVw2-FD9LjwfihbAQvbYGP2ND8IbFOimVZ643bH5dVCvT1Ea6QqSE9_U1_aJxc1rUhjPX75d4Uly5HLqheGaZgRpf-aqD813LuoSaj9pA7EUvZHgrL6sDTsCxfdSc_sPwqNelZudppQNnIhdBGgCcM4QFJ9sKbuq0wr-OzYfyU4gPoS4tpuOucqgWMwqn5WAiEQS49Tzn0BoeVCmsPD1heTzSn56t37Lv3AQyhJd2sXRRCSkdEIARBUWKptQMff6uL91d77d9L5okqiHJTCwYXijpjDC4EgtZQ5eGlUVd9t3CsSgKP7vhjiof59qP8sqUiytasvU0Mh2KrVITwhNNAZmTfob4xfCKzaxODLfsOHRGQCylaDqMwq_9wF4nR_nJ6NwTteO33oGrrehVtsAH_et073Xdv3jStTnAUDjUUwxniwxYePJGIDVABUZA5WO5TXEjOmeMOwrNkLl4SR0VXRGqX4DGHG1lg-NgtcfAMp8k0LVNgYwAYa17yyzHA7LX06OX56CKUgZU0rz_qlF0lDhgxMVQLosmRUT3_jSc0OBIy-NC_z7i8-ZN84wb5iAq5BJH4HQVWounr_thxZzZ9wp_FNPBWkxpUflKcn06_XOmIZIcSlj4q7h9nm-IZG050RhAnEBOzH70w2gd07BC24oow0pEWA4B36gLKQkWMwkbnv26kYBJ9kKomZOwCl__mqTlHkPwSiTbAjT5YJM3c27JZNck_1zBZQYZWeWR5OokcRKjVqmljrw4tm_DyZg61LJxnwJwaNYfjfVNmcVdafrsoGNhnQh0sEcYewyjwv4Sa1j4Yl2fEDM0iDwdO7GM9BH44e0n2nU4-3h4v3ZQtHar7-TtEF0qqyNNOzhV6XbV4ofURNCEO0lrqHjvWY9QCexAEkj5DYfHSDMoRgmGgsge1TJzXco9tWE3XgvqGwmhTkFRBgBK-6YuIASm5LmE7BD32nELI-AY58oHXfIITR5wGLM7wTlzeMpUQ6UxwzjRxGWswt020ojqsLrdMv9ghZ0du8bkkpb5wOXp1-NZtSU0BgG-2hrgRyPazLFXeQiQ8rSec9vMjIVvrDkdOaURhkOs6C4SZp5fVx2SohGTpz4xohyoe15y3W_ZJ_-cHDmqlRXUtS9JUTJQfYsxpMHyS6eONR--9xxV4gtigJFD87TvenXMMb27-6fcw4AZvUVii47wDAjhzo3P_jDMNUtrmOSMCoEknTktp5aFsvaLBtSoMep73diWsOdFRJolW_xBWrw65Z2gOJpYEeOTVKiBbppoV8t83s2Giiq2nDmLWtLS9pBQG0L26Nq6rBPRSmh62Ju09UN1r_MHfhMepkgexB6glhguJMlsfMO-lrn7F7R8oDWaiPDL39HGOFCXWyPUQAPMm0qxmPenmzEAJMF0D0e0EUFcW0xiT134DHk8JfPO9PD0EN-BzfAtRkM9bhLPAug3b744jaebKV3uvkrsRVHp6FkVoA4oDKMUVonMY6JEnsV8A0cL_9aqO-ZZwCEvuJveSQs6RW1a9hggbpBaCCns8U86BdZMsRWzhTVKT39-E06Qj75w2aqrL8YNYvEP7v6D_TDa6pulUCGgqswu6mITicMFnb-uT7f9UDQemoaGXS9zG2AH2L5BT_htgvWhhdFg5sjC7YVv7YrUPCJhP7rcl4LQWE1bPmfQs6QuzqRoK4Yrv03Zk8Xcfg5LPtUCxY5hGqAk0-SYho29evxUgoUVzGsFNlXocEC1fj2SYIEQSkrwmM-LKjkkpzCEjsZ8anzAEmwRyUSATAEMD3o0z9gjVAhlc_SPr67X56c3DesWdY_-jLzuI-rZ7F91iFmsT_9Jl57VmnQBoZbtMdBgNgx1fUxmi5G4nvGlSCbqY0irdkIdlJqxHlClfUFDSlysFzN3pucU9kDhhyIDTePzCcs2UnFbEnrx_se9onkQc3azTQYsQ7b1BDA1Da0rb8qBdmY_CRfVqJkRu8zn9ukZdiMb2guYNV0GqEbtp7GNraB6xlwLHo5pUoCIIGfq0MhuKkNLuokbeyUUssXfEal10RcOb2p_ZBVtWxFXUqpY3pTSG0upmwALg4h28AfbrFE1ZBbRveMMhGcOCi5Sh4o8Y0zE5ufQoju_qaJtDjR4sQotRyREROaogP5-Jajs-Tf9r8eBHH9FmXkLhy5KDQdTE2LS1fqbz2lKfW9lir4vnzBDBGk3ZHS-znO_AdEsISbImRx1waC5Crb8P2rBn_OLELZO3RHsfVek44VhKvT2u1YY6ytWueUuEVy1daq0g75MMK7SMGgehlng8JzlZTAQgtXxRqu7fKYdcsWnJ6uwHnURPgWCypn03H8oJhZ0Pwv99vR93mJ35nVMjeGZhLVWJ1Mt1POEW2zIqMt94ZlvaGOxu_H0oxWhXsUh8CY1gVEXmr05PDW3lyeAj7NCRLjSadlQ7pPHJm63f2IZ5w7q8gaH4os1G3Ts3K_hE4sji7w83wwWYqMb_VglBn_La48EXzzCOGQcHrF_yC_5mKWOmG646i9tROFvi4EHjBBe23rEooepEWPY03FYR7_AOj7fTtjJFRXQ2rnzbdvgeTTl_2qLuvAz6yYRDNpxF7yS5CYOGaPmcx-RBeRp2VUw0_p1SUiL1c906djKyu2r1dZGB5NN_TjRALDGHkc1CHw2XhGeHAP_d_FawnoK9yB07l2KClmMXaCq90unOHsv262_rpQF8ZacJ0dyAb7iMK1q1-lJ4x3ZbnDPT1yMMkpjPJ5HN4f9S79IbAiyljHGydXYkyMRWNjveu_YOZZCzELONUWasYQigpacep0LVSGZTEwZcz28oYyLyCcu0os_n1Mn_Jwc6jg-Je2_k3CyO41Iz_3y1cirWqOBCvxBLBhznNLbuNRiVBOKFFEApUy1pMsnnpm6PAkCSXKZ2DTyrzEND5Nz5H3rlg_yWXbLwIIvRW6ruc0uoJfI77mcaxttZVQhQYeoD2QxnKjY7nTfNT7zq5-WpSlObalOTh3LCrbBdEwe1sySF6qRYe_-qEHtPMhHTnx0-3qYv-GBJcw-vDwdDtcHWrvaZ9DMNLRcYRLVFtM7dBceXRWDRLVk_-_AK6Xk3vWNLuxdVvy5fWDDBmIpRU8l5PfWgmI0jDjbE-qPoMTKe6yqjKtcm0-yKASplIE46_OFGYhH6_L4amDF1e96SM_tcN5H63czkszXISnpVXsRQPVknzQ7Mif6wVVmHqPZm9x0FgwfggGI0D5oHNgLlReyyMRt35KcZkwETGdbDThGOr3CDvyNGIlPkw1PLDPnm5MyQSBpfR1yGgvVjYw7lG65nAG0Bh5iJMGmKxShsT8SXa8ssCcOQncK6jS3R9mJ8-tVzeCTWdmog_CP0auuobyxxn9LyI8SY=",
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "function_call": null,
+                  "function_response": null,
+                  "text": "{\n  \"verdict\": \"unsupported\",\n  \"assertions\": [\n    {\n      \"claim_text\": \"NICA bonus share announcement coming soon, book close date is near.\",\n      \"status\": \"not_found\",\n      \"source_figure\": \"Not yet sourced\",\n      \"quote\": \"Any disclosed bonus share announcement for the current fiscal year\",\n      \"source_file\": \"sources/nica.md\"\n    },\n    {\n      \"claim_text\": \"Price always goes up after bonus.\",\n      \"status\": \"not_found\",\n      \"source_figure\": \"N/A\",\n      \"quote\": \"N/A\",\n      \"source_file\": \"sources/nica.md\"\n    },\n    {\n      \"claim_text\": \"Bonus shares are basically free shares.\",\n      \"status\": \"not_found\",\n      \"source_figure\": \"N/A\",\n      \"quote\": \"N/A\",\n      \"source_file\": \"sources/nica.md\"\n    }\n  ],\n  \"computed\": {},\n  \"summary\": \"The claim that a bonus share announcement and book closure date are imminent is not supported by the provided filings, which list any bonus share announcement for the current fiscal year as not yet sourced. Additionally, NICA paid no dividends in the last two fiscal years (2080/2081 and 2081/2082). Statements asserting that share prices always rise after a bonus or that bonus shares represent free value are unverified by source data.\"\n}"
+                }
+              ],
+              "role": "model"
+            },
+            "citation_metadata": null,
+            "finish_message": null,
+            "token_count": null,
+            "finish_reason": "STOP",
+            "url_context_metadata": null,
+            "avg_logprobs": null,
+            "grounding_metadata": null,
+            "index": 0,
+            "logprobs_result": null,
+            "safety_ratings": null
+          }
+        ],
+        "create_time": null,
+        "model_version": "gemini-3.6-flash",
+        "prompt_feedback": null,
+        "response_id": "R5SSapSVA7uEg8UP1oOn-Ao",
+        "usage_metadata": {
+          "cache_tokens_details": null,
+          "cached_content_token_count": null,
+          "candidates_token_count": 345,
+          "candidates_tokens_details": null,
+          "prompt_token_count": 3481,
+          "prompt_tokens_details": [
+            {
+              "modality": "TEXT",
+              "token_count": 3481
+            }
+          ],
+          "thoughts_token_count": 1153,
+          "tool_use_prompt_token_count": null,
+          "tool_use_prompt_tokens_details": null,
+          "total_token_count": 4979,
+          "traffic_type": null
+        },
+        "automatic_function_calling_history": [],
+        "parsed": null
+      },
+      "error": null,
+      "time_taken_seconds": 11.406
+    },
+    {
+      "id": "case-3-ebl-undervaluation",
+      "company": "EBL",
+      "model": "gemini-3.6-flash",
+      "source_files": [
+        "sources/ebl.md",
+        "sources/macro.md"
+      ],
+      "prompt": "You are checking whether an investment claim is supported by a company's own filings. You are given a set of SOURCE DOCUMENTS and then a CLAIM.\n\nWork only from the source documents. Then return a single JSON object, and nothing else, in exactly this shape:\n\n{\n  \"verdict\": \"supported | partly supported | unsupported\",\n  \"assertions\": [\n    {\n      \"claim_text\": \"the specific assertion being checked\",\n      \"status\": \"verified | contradicted | not_found\",\n      \"source_figure\": \"the actual figure from the source documents\",\n      \"quote\": \"the exact line from the source document\",\n      \"source_file\": \"which file it came from\"\n    }\n  ],\n  \"computed\": {\"any calculation performed, showing the arithmetic\"},\n  \"summary\": \"two or three sentences for a retail investor\"\n}\n\nRules:\n- Break the claim into its separate assertions and check each one.\n- Every figure must come from the source documents. Do not use general knowledge about these companies.\n- If a figure is not in the sources, mark it not_found rather than estimating it.\n- Show the arithmetic for anything computed, e.g. \"1200 / 40000 = 0.03 = 3%\".\n- If \"computed\" has no entries, return it as an empty object {}.\n- Never advise buying or selling. Describe what the evidence shows and stop.\n\n=== SOURCE DOCUMENTS ===\n\n--- sources/ebl.md ---\n# EBL — Everest Bank Limited\n\nRetrieved: 29 August 2026\nMarket figures as of: 27 August 2026\n\nSources:\n- Market data, capital: https://www.nepalstock.com/company/detail/ (EBL page)\n- Dividend, market price: https://www.sharesansar.com/company/ebl\n- Dividend history, independent corroboration: https://hamroshare.com.np/company/EBL/dividends\n- Benchmark deposit rates: https://www.nicasiabank.com/interest-rates/\n\n## Market data\n\n- Last traded price: Rs 729.50\n- Previous close: Rs 730.00\n- Day high / low: Rs 734.00 / Rs 723.20\n- 52-week high / low: Rs 780.60 / Rs 619.00\n- Open: Rs 734.00\n- 120-day average: Rs 706.79\n- 180-day average: Rs 694.23\n- Total traded quantity: 16,639\n- Total trades: 171\n\n## Capital\n\n- Sector: Commercial Banks\n- Listing date: 3 April 1995\n- Listed shares: 137,213,760\n- Total paid-up value: Rs 13,721,376,000\n- Market capitalisation: Rs 100,097,437,920\n- Implied par value: Rs 100\n\n## Annual results\n\n| Fiscal year (BS) | Net worth per share | Net profit | Paid-up capital | P/E | EPS |\n|---|---|---|---|---|---|\n| 2081/2082 | 246.74 | Rs 4,839,903,472 | Rs 12,944,694,268 | 18.76 | 37.39 |\n| 2080/2081 | 237.16 | Rs 3,703,225,086 | Rs 11,767,903,880 | 17.80 | 31.47 |\n| 2079/2080 | 238.33 | Rs 4,847,362,000 | Rs 10,698,094,436 | 17.75 | 31.72 |\n| 2078/2079 | 227,545.53 (see data quality note) | Rs 2,479,400,875 | Rs 9,427,340,209 | 16.69 | 26.30 |\n\n## Current dividend\n\n- Fiscal year: 2082/2083\n- Cash dividend: 10.00%\n- Bonus share: 5.00%\n- Total: 15.00%\n- Book close date: not yet set (declared, unpaid)\n- Cash dividend per share: Rs 10.00 (10% of Rs 100 par)\n\n## Dividend history\n\n| Fiscal year (BS) | Bonus | Cash | Total | Book close |\n|---|---|---|---|---|\n| 2082/2083 | 5.00% | 10.00% | 15.00% | Not yet set |\n| 2081/2082 | 6.00% | 14.00% | 20.00% | 2025-10-10 |\n| 2080/2081 | 10.00% | 5.53% | 15.53% | 2024-09-24 |\n| 2079/2080 | 10.00% | 10.53% | 20.53% | 2023-10-03 |\n| 2078/2079 | 13.00% | 7.68% | 20.68% | 2022-11-29 |\n| 2077/2078 | 6.00% | 4.32% | 10.32% | 2021-12-03 |\n| 2076/2077 | 5.00% | 5.53% | 10.53% | 2020-12-25 |\n| 2075/2076 | 5.00% | 20.00% | 25.00% | 2019-12-20 |\n| 2074/2075 | 0.00% | 20.00% | 20.00% | 2018-12-12 |\n| 2073/2074 | 33.00% | 1.74% | 34.74% | 2017-12-28 |\n| 2072/2073 | 70.00% | 3.68% | 73.68% | 2016-12-21 |\n| 2071/2072 | 30.00% | 6.57% | 36.57% | 2015-12-01 |\n| 2070/2071 | 12.00% | 50.00% | 62.00% | 2014-09-03 |\n| 2069/2070 | 10.00% | 50.53% | 60.53% | 2013-09-18 |\n| 2068/2069 | 30.00% | 1.58% | 31.58% | 2012-10-19 |\n| 2067/2068 | 10.00% | 50.00% | 60.00% | 2011-10-17 |\n\n## Computed\n\n- Price to book: 729.50 / 246.74 = 2.96x — trading at nearly three times book value\n- Cash dividend per share: Rs 10.00\n- Cash dividend yield: 10.00 / 729.50 = 1.37%\n- Cash payout ratio: 10.00 / 37.39 = 26.7%\n- Earnings yield: 37.39 / 729.50 = 5.12%\n- Net profit growth, 2080/81 to 2081/82: 3,703,225,086 to 4,839,903,472 = +30.7% (annual)\n- EPS growth, 2080/81 to 2081/82: 31.47 to 37.39 = +18.8%\n- Price against 52-week high: 729.50 against 780.60 = -6.5%\n\n## Cross-checks\n\n- Market capitalisation: 137,213,760 x 729.50 = Rs 100,097,437,920 — matches\n  the published figure exactly\n- Paid-up value / listed shares = Rs 100 par — consistent\n- P/E: 729.50 / 37.39 = 19.51 against published 18.76. A gap of about 4%,\n  most likely because the published ratio uses a price from a different date.\n  Noted rather than resolved.\n\n## Data quality note\n\nThe 2078/2079 annual row reports net worth per share of 227,545.53. That is\nroughly a thousand times the value in adjacent years (237–247) and is\nimplausible for a Rs 100 par share. It appears to be a decimal or unit error\nin the published data. Any system reading this series should sanity-check a\nfigure against its own neighbours before using it.\n\n## Benchmark comparison\n\nCurrent bank fixed deposit rates for individuals: 2.75% to 4.00% depending on\ntenure, effective 1 Shrawan 2083 (July 2026).\nSource: NIC Asia Bank, https://www.nicasiabank.com/interest-rates/\n\nEBL's cash dividend yield of 1.37% is well below the entire deposit range.\n\n## Sector context — required for the attribution check\n\nThe claim under test cites \"net profit up 32% this quarter, best in the\nsector.\" The published sector figure is commercial banks' combined net profit\nup 32.33% to NPR 69.78 arba in Q4 2082/83, with Nabil Bank named as leading.\n\nThat figure belongs to the sector, not to EBL, and covers a different period\nfrom EBL's 2081/82 annual results. EBL's own annual growth was 30.7%.\n\nSource to verify:\nhttps://www.sharesansar.com/newsdetail/nepals-commercial-banks-net-profit-surges-3233-to-npr-6978-arba-in-q4-208283-nabil-bank-leads-2026-08-16\n\n--- sources/macro.md ---\n# Macro context\n\nRetrieved: 29 August 2026\n\nThis file holds the benchmark rates any dividend yield claim is compared\nagainst. The benchmark is read at runtime, never assumed.\n\n## Current fixed deposit rates — individuals\n\n### Nabil Bank, effective 1 Bhadra 2083 (August 2026)\nSource: https://www.nabilbank.com/interest-rate\n\nNormal:\n\n| Tenure | Rate |\n|---|---|\n| 3 months to below 6 months | 2.80% |\n| 6 months to 1 year | 2.85% |\n| Above 1 to 2 years | 3.00% |\n| Above 2 to 5 years | 3.25% |\n| Above 5 to 10 years | 4.00% |\n| Above 10 years | 4.55% |\n| Cumulative, 1 year | 2.85% |\n\nRemittance, a 1.00% premium over normal at every tenure:\n\n| Tenure | Rate |\n|---|---|\n| 3 months to below 6 months | 3.80% |\n| 6 months to 1 year | 3.85% |\n| Above 1 to 2 years | 4.00% |\n| Above 2 to 5 years | 4.25% |\n| Above 5 to 10 years | 5.00% |\n| Above 10 years | 5.55% |\n| Cumulative, 1 year | 3.85% |\n\nMinimum tenor: 3 months.\n\n### NIC Asia Bank, effective 1 Shrawan 2083 (July 2026)\nSource: https://www.nicasiabank.com/interest-rates/\n\n- Range: 2.75% (shorter terms) to 4.00% (five years and above)\n\n### Everest Bank, effective 1 Bhadra 2083 (17 August 2026)\nSource: https://everestbankltd.com/supports/interest-and-rates/interest-rates-deposit/\n\n| Tenure | Rate |\n|---|---|\n| 3 months to 2 years | 2.75% |\n| Above 2 to 5 years | 3.50% |\n| Above 5 years | 4.05% |\n\n## Benchmark used\n\n| Bank | Lowest | Highest |\n|---|---|---|\n| NIC Asia | 2.75% | 4.00% |\n| Nabil | 2.80% | 4.55% |\n| EBL | 2.75% | 4.05% |\n\nRange across all three banks: **2.75% to 4.55%** for individual normal fixed\ndeposits. Remittance-linked deposits run higher, from 3.80% to 5.55% at\nNabil.\n\nRates cluster tightly across banks, so this range is representative rather\nthan one bank's outlier. The lowest rate available anywhere in this survey is\n2.75%.\n\nA dividend yield below this range pays less income than a fixed deposit,\nwhile also carrying price risk the deposit does not.\n\nThe correct comparison depends on both tenure and depositor category.\nQuoting a single deposit rate would hide that choice, so any comparison must\nname which rate it is using and why.\n\n## Historical context\n\nDeposit rates have fallen sharply. In Ashoj 2079 (September 2022) individual\nfixed deposits paid 12.133%, institutions 10.133% and remittance deposits\n13.133%, with some banks offering as much as 15% on remittance deposits.\nRates were cut to 11% for individuals from Magh 2079 (January 2023).\n\nThe 1% remittance premium visible in Nabil's current rate card is the same\nstructure that produced those higher 2022 remittance figures.\n\nSources:\n- https://www.sharesansar.com/newsdetail/most-banks-alter-their-interest-rates-individuals-deposit-interest-rates-increased-by-3-digits-after-the-decimal-point-2022-09-21\n- https://www.sharesansar.com/newsdetail/committee-of-nepal-bankers-association-has-decided-to-decrease-fixed-deposits-interest-rates-for-the-month-of-magh-2023-01-12\n\nThe same check produces opposite verdicts in different rate regimes. A 5%\ndividend yield loses against a 12% deposit and beats a 4% one. This is why\nthe benchmark is read from this file rather than written into the code.\n\n## Comparison against the cases\n\n| Company | Yield | Lowest deposit rate | Verdict |\n|---|---|---|---|\n| NABIL | 2.31% dividend yield | 2.75% | Below every deposit product surveyed |\n| EBL | 1.37% cash dividend yield | 2.75% | Below every deposit product surveyed |\n\n=== CLAIM ===\n\nEBL net profit up 32% this quarter, best in the sector. Still trading below book value, market has not priced it in yet. Undervalued blue chip, accumulate now.",
+      "response_text": "{\n  \"verdict\": \"unsupported\",\n  \"assertions\": [\n    {\n      \"claim_text\": \"EBL net profit up 32% this quarter, best in the sector.\",\n      \"status\": \"contradicted\",\n      \"source_figure\": \"EBL annual net profit growth was 30.7%; sector combined profit grew 32.33% led by Nabil Bank\",\n      \"quote\": \"That figure belongs to the sector, not to EBL, and covers a different period from EBL's 2081/82 annual results. EBL's own annual growth was 30.7%.\",\n      \"source_file\": \"sources/ebl.md\"\n    },\n    {\n      \"claim_text\": \"Still trading below book value\",\n      \"status\": \"contradicted\",\n      \"source_figure\": \"2.96x book value\",\n      \"quote\": \"Price to book: 729.50 / 246.74 = 2.96x — trading at nearly three times book value\",\n      \"source_file\": \"sources/ebl.md\"\n    }\n  ],\n  \"computed\": {\n    \"price_to_book\": \"729.50 / 246.74 = 2.96x\"\n  },\n  \"summary\": \"The claim misattributes sector-wide figures to Everest Bank Limited, as the 32.33% growth figure refers to total commercial bank sector profit led by Nabil Bank, whereas EBL's annual net profit growth was 30.7%. Additionally, EBL is not trading below book value; with a stock price of Rs 729.50 and net worth per share of Rs 246.74, it trades at nearly three times book value (2.96x).\"\n}",
+      "response_json": {
+        "verdict": "unsupported",
+        "assertions": [
+          {
+            "claim_text": "EBL net profit up 32% this quarter, best in the sector.",
+            "status": "contradicted",
+            "source_figure": "EBL annual net profit growth was 30.7%; sector combined profit grew 32.33% led by Nabil Bank",
+            "quote": "That figure belongs to the sector, not to EBL, and covers a different period from EBL's 2081/82 annual results. EBL's own annual growth was 30.7%.",
+            "source_file": "sources/ebl.md"
+          },
+          {
+            "claim_text": "Still trading below book value",
+            "status": "contradicted",
+            "source_figure": "2.96x book value",
+            "quote": "Price to book: 729.50 / 246.74 = 2.96x — trading at nearly three times book value",
+            "source_file": "sources/ebl.md"
+          }
+        ],
+        "computed": {
+          "price_to_book": "729.50 / 246.74 = 2.96x"
+        },
+        "summary": "The claim misattributes sector-wide figures to Everest Bank Limited, as the 32.33% growth figure refers to total commercial bank sector profit led by Nabil Bank, whereas EBL's annual net profit growth was 30.7%. Additionally, EBL is not trading below book value; with a stock price of Rs 729.50 and net worth per share of Rs 246.74, it trades at nearly three times book value (2.96x)."
+      },
+      "response_raw": {
+        "sdk_http_response": {
+          "headers": {
+            "x-gemini-service-tier": "standard",
+            "content-type": "application/json; charset=UTF-8",
+            "vary": "Origin, X-Origin, Referer",
+            "content-encoding": "gzip",
+            "date": "Sat, 29 Aug 2026 08:12:13 GMT",
+            "server": "scaffolding on HTTPServer2",
+            "x-xss-protection": "0",
+            "x-frame-options": "SAMEORIGIN",
+            "x-content-type-options": "nosniff",
+            "server-timing": "gfet4t7; dur=12041",
+            "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+            "transfer-encoding": "chunked"
+          },
+          "body": null
+        },
+        "candidates": [
+          {
+            "content": {
+              "parts": [
+                {
+                  "video_metadata": null,
+                  "thought": null,
+                  "inline_data": null,
+                  "file_data": null,
+                  "thought_signature": "EvYiCvMiARFNMg8zsUkDmb34oTuMkI1eb77oVV9rgIiGOUcmW1eEYvtrPSYatiV7hPyp9jVLBX1ak39zg4vqDj8mOQDarRjNDuhK_KP7Z1yrfsvGqQxiSBuO0zE2DuvlOgjGnaB9KXQkkQY7lTYfErxvDLVIxSliRVjEmLtLxvvmnVrxl11SUqY-HZdAD68YsxvDkREker9GN1A-X0BQJkCeHJhytSD5lIPael5RA2gRTe3wQHg5sQcZv6Aa1jPRPU-HhNgFL_0V1hiKpNzYk6ChoApHq7U608be8747TPRt3y9vg2aqfHtA_LAUwHK8ibAoqz0hqxJRAXkZXCnfKB7qvrvTHuMV5mn1aJi1L3vvAJJTRIyf9UpYYti0wye06FmTTfCGA3YgexSYQ18ZyfZX82MfteTt-biI5JQrpILxCedWHyb74PFo4Rq13NJFmwPdMOs30I3FQrvjiA66iLm86DQpar67tGfyEapHpqy3_kLG-afEWAla1nwb4uRRJ1y5CEOIpk5DFLjW_WwgOAIUPEVFhecgebgFeVXxcaiqqTNZPXFBjTsloW-IL0nP7HHUHTDokgAqtGPuK4LgKh2lb5r1WgEA0nm3nq8WWluSUXXlPI1GC5Pyc4bAFaJGFL144ApmYHmAiRaO9mmGQ1qjiwL515SXiuGEow0-TwgG6tnx7RhyuSV3vIIwrguP2c_F42CgC8WDKREURHGGnYoZ7mQKh5XPxGuSjTY1wyjq8jDW7lzg7jKnWn02OUcWxUILtNVEw8jeK-o2wSdJnwbdbpDRKMz3rWAuc10fbLhhydKodxehNEBMMQIpr10cr2UfD_I5uNwjFhg9rgHDtpNFW3HeH2Nc9eSVS_K76CrkDfrMG-2xkRcjvmDypbsd62uc-WmBqi79uc6N1DnLMjGXYF3wMzxeBHYK-uqL1s7y7iN6bTFaDbjNDz8H6acTgCeDRtps4mVPwcqGmoUWHz4WTzOvkMYc92ul3kwQ5iK_P8IVs3ePJODB3F1IV0AMqNjiu_sAowTUcHt4OCeZQNtjJAIhJPaN4qPa6ibp8YewlvXtj5IobXdE78cDs0d6ibaSPLorfFmH6Dok1Ph_BQVlfiORiFt6X_g-2__DMp_TVzUxOZj_OLXNe6642v_tKcjMoezqk74W2opCciER5gsGKxLyBWW17z31gnUt_NRSvxptnCk6EeV-oScvo0B_jTQX7tHSZ3gdNxstW0Ils4UqGn1F-DQadUNEMBH9mqKPlJR4fUMmbSYrDvh-f7Pr5V9ci7fREUd9H53R7cMoP9VKWmxcg1j71CrcD0eLcqKTEcp7MO3fxyhShtK2wn5zD-W8_OD5yKt9jgP5TRkDmnM5IJekJteIwmlwDDKT04t9Fv8bi5A1SR2aNgCcjHpVYi_TgrCBosSzNbFRT9MYT6Nm0I51QcNGaH1yZc-s4BAOMlir3kDQjYaNg7Zpc-PZRGwomalgzSfbgrvMVCcQ55IyWGrtd7WDOEl17j_HOWWJqVD6DQpNb31CPtpIETqG7ADraZgHXYSbdRPi9QHldYPuiHrstZN1lvv_QjsNGFyMSb7Q0Ir2D4xIhxPh27gfS-f1i5ns4g9esH0kLSJAmHktWPI3OXKzQfpOAqi0yRHKraAfO8K8diQansxPZgej_GKEuFWujmvMQFx3fBx_K7F6jseg1z5Dvp-gUt02AScMnvR9g8fT_5J9MLq_CWCqybX6Ml5Tx5mpeE74Awx16VAM4ucT-EW9JwGFBtbw-PV69gCLSF-retaZxHYd-FjZTcMZ8pEqFnSTzinRubuyqMigFetq78q4JfR8brF9-nqb5ENlFdGds137sxgLa0pw9aYVfeUEuwpmuE5mN0IEbzZ6bV1UVp-lYgurf2HVn1iEmfWBf1ApLx7oEy_Qs0AkrzoNgeOpFfpve7d49lgn-Aag0cfY4FD32O5ZZ2XnZ_ojNw7Ut1f328BjRKykRQVrBV9_a5IsMMoJ36jR2rewcUNA5I4wQlnIyMbnq2lz_6MYgfCmUdJkG_jCm54bPYJeynZ83Fn_gFlbjrpK9fXZK92d2vZo-PXNs59whxNQxYjYB5JArmvvF2B6EDNNdB4de3B8k-0MqRjAfEYBs5wqG0B72gwZ9l8psv51YHWJ3KON_EzdkwniEaMH4QWu8NAs0C2xt_p4Xw8lFSKyw_fB4ahPc550jE16Fdch5BAxuhXv0rnVSMEGqI12erfJhCQWc-gS37fPhF50-X5UkfUiw7o4WCAFuUb4h6Q-Dp2MARTSyf50DQ2ZK8qJtxlVeN37_pWAoQRtErTOR3b-nX_NtWMBFHP0HnRLiGhnG_t3dSExBDsgSsshg9RCSCKwtlsJ4hhlE3oiiJ6SayD3C3oy2WobBONMmzTOdaiOKcnK71a7LvAjaF3fQa5sp6WeUzY0eO5nPgpvl0sL-rFzStZ-RGL4dY2HuCyZ2IdL5NSa2GNgGSj09iALFAxODxICgeAm4jTbFaCV5SYebz94VhAGnY_aO5grBAoYNc8C4geGAVAvY3fAI2Xrqicp2QnYuFWHWOCZD_iaxVizcUuevkA8Dr-4-52B8JnEugOJxiE9j1sEuUx1h57DkJm_zMXHQzZAygKLaFmzWzkogpAe6vjVz_fFtfJt3f8vRUbxNwuXxcF7dTBiCPwge18C6WD3899hSy2QTUOsDlyn_6pN89DKjUg0rAfZzZxYhPY5M7U4IM7OC4QvN1_8msB5s4oDmXXDU12vnkE7iNIg-MMMHbiBp2lcaYH2v6okS9hJT6gmsfdozvrfstoKcaWX2ibWLhE-s03b2Z_yuGFcAKQK4g34XUXnR9gXdz5U1gY3MjCb3x0W3rsh68DRyHLaxb5EZy2K6bbRp0kjPpcOgZ-Po_LnnHfk5o-ii_40sLLbhsNbMFz8bnJHUYPFzdceAeIcAKm10QhP5PucJc-7deP7xbY-98YEcz8duxyb5UaVWYTZWGOQDxOFq6766E30qT2ur9D6LW4K3f8hOCXw4RRaaIL-zUQ7IIOI_cvmGkFnFNshb1nYRU70ZP08SIW6TTSuQtcZ7br0X2xkG61j7HLpkWjSpwK9ictmbMigv7bpwv6hoN-Wr0rG4KjeSLCPjXLRK3yfxhJt1c2Vn94vyqqMlDVA9p7WoOBtOn5j5n4r9gm4b3uaoS43P4pj7-1Zz_ftzjxNJ9bv8D1jXP2N2YLAFFQjYUHB0gFvBQx02kV0jyd4ab2xYhvUizXNGAAPTDChY0QHOupwdLYW1nyffbQuO2eiqrR0OWcoPIJl-gblhNRaAf3lzy6pTa__DOITq2C7hzUNIXefYh8jzsgnBllBlaxIdlHYqm3iG1x6HkbILrON8eAHVDzCJvHFpOSWrBIzjIdARKCf0uICXJRUdAwWvlbnWkrfMWnb-ljYSqumSn1SO3kK7aQuvQ2lL6-muZo3jpOkBKkhi7Ii1o-qeGA1yWPOwMvXUsR1jFMRFOqpVheGvYP2FgyqYG3mFZsih8Y4grzvzuQDx7nqTFJmg4IPQQlXTXXc5jR5ocDdD6qFDH1WVn0OGiocjP81c4BrPJleQx6aC6KPjgef-RIhYk4_BizBaKRcu6-pCAlxFuZp6D4UkLog4jzLqsYPN1zB955tk_O3xNeg1RECydfKcLwy8mkq-cqaPMrgOFI2480KxnBYf6Ta4UpsdbhEIS329LveDYc6yn6ODSNVRUPI6o_O6wyv6Fgz1LZqPapRIQeRCctvgNdGI33i3gQkQII0SSPp2wGENh4iMY2jy_00aD_Ff5T6HN-5IPau5Hzu1mM4WBu6GswGo09bwh_xeLG9SPZnfo95ARminu2n2w8y2qSvFrtqthKKFthfzaJHbkLBGtD8Lql-naVukHedN-SGdw_2cXFsJapYuLtFaHu-hfRByn-3bIE5s6IRwLLP7DPD7zix-sy8WTzctsSLTTsTjitdFXwqyX2ipP08VG5FR_W6HduQvkTBW0A0LhUeotCnJNvLp_Xg7ENd9bjA21dfwF6s3jIixGW7_dcmmM60qmACPPMbB0yBCzB7xZ7o97NbIiDtiBWNLPHRIqrfpK7uFXlJ8fW5ojedoGlS5kWTBmd7YdwXBZt_rRLTqv9qJPmRVlHHCpYt9r2ZsWRBlIPyvCjF7AaF2togFiQ2lq76u4JfvyPSNSrnfd_ievX_KwZLTCrVN5FAhRUMAm_a-DaLq15NThnrPa3Q5Zwy7zSX0THGgUSaxiNRZTIasIuLlOa7YAI5ivxzqNevuNKcUJ14hZHScIuCvPR_6HrOnIlBYmiopWWO9Urfz20gBUAvThO1yUnM_kg-VwSQhwc4-hkw60cfY8GkiYFF6ZX6XayeFD-e82WtB2Wm0DXuBI838CVN26nQy-FqkqBFThTU-mvuhPCe1tN_u8bnE0RTTPIa1tHvKwHxfJ0KkiKSiklY-b4UnNIq02oM93NmXVuSusywBfj0t-TptNU9P-Em9dDaSsqSLqJwiP3njhXdLk7LKh2PCtWSO3eOvtGYItSz40DHjKppioTBzhGeuqyviTKIMuY7AvmzsX9U63Z3CRoM4KX3QDTFpcvU2auCTkkmULgNZ9pxlhsMqOuS-AF-6MArz2SDjvS9Y0UeVuOajAquxOdBttqHXr-4G04jzQMqc0uK1Le2juNtUipeb0YDrNgvTsxi0FNgyKdZDi1Si4bsFQMkzu7E_5CsTatElBHwFr8ItXDGsddaRs3-NSRz0cEUPfogba2zbtK1FAnOQqSkPwzOgaO0aSCqFBsa9gOhoOAiG3IQR8BWw7K-RVRdiCpEf0aNaKjUX6h3hLd8UPtG5DC-LHsd2gghgMgQTp-7qfWLh-xthiDyI5uB-zV2v9vBZ9LUWwSdZ-wshKvIeeMH7GYM67e6IeYcJUNR_Ld97vySsYKa7eQnpB_S74HM6Kt1mdizLypH6lhdASGq0uf1vdjEY6mStjMjCGyECrpHqCy0aYayb8UKwJbh33olxjy4Bx2wL8i7nvSm27y_wu8AzpRN65bmJz54Tm6IFj-yZ-dazMbDaTfQ2l1goFgR7SXkCX7Po_BiTeSRsgO83R0O9utm_sOVKJGMGlb0CO994L_mrFpJTYw-alUYmipKlC_pYwR5BlGScHbIWySEn2PdVeDIkF4WtMV6IRhy4i-bdTEe_LH6GQB5qKgG24LP7ALYFHkK-CXMHEIlydTNlyIlz3ENfBymY2I9vCw2EzN0afWE_V6WeKk2pg4XK1oUT97Ava6C6ujgwTrEqHixupC4zSB1DVwr0502Mzac8-ap4ubt-RLiFXanCpnyhKDdV0MMVI5xiw88gE5f77BecYu6UBEHNwmldjYi_XdX22VBUaeByJXRomUkWzCwa3uHDBaq4B10aPkA3QNzFNfZ4yNmAFkUWjh9S7NM6Zi-XNuGvMNn1aBV2L0tSAV1IcKdjYn0gW5yEAT-Grojhu-jsT90UneqioSkDrPW3iuEiMTP4nrX8UNwAXn9tJmqsP8Uau9cjxiIcAhjKgihUBcX-v2bhFqZ1Du4iP250_qlF5R0fM1Iv-mzroHjgIIBIH87CHe-unN6C8bRmgDpFw1lhjiU4_QCaWIbqqJu2ndwBZ1kr2riqm3C6i5qrL3pdf4qH3yVv0k5b1RiYO8Jjt8L9Yy43kQJsCMNy8bVlMy-YVevHZYu4oYwAJOJXPRyTCf7Jb7CKkoXghHIj-YwY20CXDIuF8F3pyariHoTJaeL7N_lAFPbOU4TfR3fDhwM1AFs0HXfXv8DvAUNNTtaUxGBL7PEeX3ETzFjdkiIGONfkRo4648_v92C2krAHcRsUo8ZLTzdi5f-MGhWV_krf-q3jxMX1pFurit3f9Nq7IxbyJ97ls7Hs4fc8OiolB32ew_dtwyX02P4ebbHr1_gVlu20v2CCcusnhs329_-Rd87hlF680MVUdX_GXNCNh_VWe4RzMi3",
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "function_call": null,
+                  "function_response": null,
+                  "text": "{\n  \"verdict\": \"unsupported\",\n  \"assertions\": [\n    {\n      \"claim_text\": \"EBL net profit up 32% this quarter, best in the sector.\",\n      \"status\": \"contradicted\",\n      \"source_figure\": \"EBL annual net profit growth was 30.7%; sector combined profit grew 32.33% led by Nabil Bank\",\n      \"quote\": \"That figure belongs to the sector, not to EBL, and covers a different period from EBL's 2081/82 annual results. EBL's own annual growth was 30.7%.\",\n      \"source_file\": \"sources/ebl.md\"\n    },\n    {\n      \"claim_text\": \"Still trading below book value\",\n      \"status\": \"contradicted\",\n      \"source_figure\": \"2.96x book value\",\n      \"quote\": \"Price to book: 729.50 / 246.74 = 2.96x — trading at nearly three times book value\",\n      \"source_file\": \"sources/ebl.md\"\n    }\n  ],\n  \"computed\": {\n    \"price_to_book\": \"729.50 / 246.74 = 2.96x\"\n  },\n  \"summary\": \"The claim misattributes sector-wide figures to Everest Bank Limited, as the 32.33% growth figure refers to total commercial bank sector profit led by Nabil Bank, whereas EBL's annual net profit growth was 30.7%. Additionally, EBL is not trading below book value; with a stock price of Rs 729.50 and net worth per share of Rs 246.74, it trades at nearly three times book value (2.96x).\"\n}"
+                }
+              ],
+              "role": "model"
+            },
+            "citation_metadata": null,
+            "finish_message": null,
+            "token_count": null,
+            "finish_reason": "STOP",
+            "url_context_metadata": null,
+            "avg_logprobs": null,
+            "grounding_metadata": null,
+            "index": 0,
+            "logprobs_result": null,
+            "safety_ratings": null
+          }
+        ],
+        "create_time": null,
+        "model_version": "gemini-3.6-flash",
+        "prompt_feedback": null,
+        "response_id": "UpSSaufVEtGLjuMPkZu9kQw",
+        "usage_metadata": {
+          "cache_tokens_details": null,
+          "cached_content_token_count": null,
+          "candidates_token_count": 424,
+          "candidates_tokens_details": null,
+          "prompt_token_count": 3980,
+          "prompt_tokens_details": [
+            {
+              "modality": "TEXT",
+              "token_count": 3980
+            }
+          ],
+          "thoughts_token_count": 1420,
+          "tool_use_prompt_token_count": null,
+          "tool_use_prompt_tokens_details": null,
+          "total_token_count": 5824,
+          "traffic_type": null
+        },
+        "automatic_function_calling_history": [],
+        "parsed": null
+      },
+      "error": null,
+      "time_taken_seconds": 12.078
+    }
+  ]
+}

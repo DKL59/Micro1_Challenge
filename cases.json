@@ -3,18 +3,21 @@
     "id": "case-1-nabil-dividend-vs-deposit",
     "company": "NABIL",
     "claim": "Nabil declared 30% dividend this year. Bank FD is giving only 4%. Why keep money in fixed deposit when a blue chip bank is paying 30%? Long term hold, guaranteed income.",
+    "sources": ["sources/nabil.md", "sources/macro.md"],
     "my_verdict": ""
   },
   {
     "id": "case-2-nica-bonus-share",
     "company": "NICA",
     "claim": "NICA bonus share announcement coming soon, book close date is near. Buy before the announcement, price always goes up after bonus. Basically free shares.",
+    "sources": ["sources/nica.md", "sources/macro.md"],
     "my_verdict": ""
   },
   {
     "id": "case-3-ebl-undervaluation",
     "company": "EBL",
     "claim": "EBL net profit up 32% this quarter, best in the sector. Still trading below book value, market has not priced it in yet. Undervalued blue chip, accumulate now.",
+    "sources": ["sources/ebl.md", "sources/macro.md"],
     "my_verdict": ""
   }
 ]

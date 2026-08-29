@@ -218,3 +218,45 @@ evidence says otherwise. Had I not run the baseline before building
 the agent, I would have spent the weekend optimising the wrong axis.
 
 **Evidence:** results/baseline.json, generated 29 Aug 2026.
+
+## 29 Aug 2026 — Source hierarchy: primary over secondary, and say which
+
+**Decision:** Where a figure exists in more than one place, the agent uses
+the primary source — the institution stating its own terms or reporting its
+own results — and names which source each figure came from. Where only a
+secondary source exists, the output says so.
+
+**Options considered:** Treating all sources as equivalent, versus ranking
+them and making the ranking visible in the output.
+
+**Why:** While assembling the benchmark I used three banks' own published
+rate cards for current fixed deposit rates, and news reporting for the 2022
+historical rates, because banks do not publish historical rate cards. Those
+are different classes of evidence and should not be presented as though
+they were the same.
+
+A bank's own rate card is the institution stating its terms. A news article
+reporting those rates is accurate in most cases but one step removed, and it
+can be summarised, rounded or stale. The Investopaper article on NIC Asia
+demonstrated the risk directly: it described a company that paid nothing in
+four of the last five years as having "provided consistent dividends," which
+is defensible across twenty years and misleading about now.
+
+Corroboration between two independent secondary sources is also worth
+recording. Nabil's dividend history was confirmed identically by ShareSansar
+and Hamroshare, and NIC Asia's by NEPSE and Investopaper. A figure confirmed
+twice is stronger evidence than a figure stated once, and the output should
+be able to say so.
+
+**Consequence for the design:** every figure in a source file carries its own
+URL rather than the file carrying one URL for everything. The agent cites the
+specific source behind each number, not the document it happened to find it
+in. Where two sources agree, it can say so. Where only secondary reporting
+exists, it says that too.
+
+**Overruled:** My assistant compiled the macro file with the historical news
+links listed alongside the banks' own rate cards. I queried whether
+ShareSansar was being credited for the current rates when those came from the
+banks directly. The attribution was correct but the presentation was
+ambiguous, and ambiguous attribution is the failure this project exists to
+catch.
