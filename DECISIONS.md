@@ -621,3 +621,64 @@ independent equity research on NEPSE" when the accurate description is two
 years of personal investing, mostly on technical analysis. I corrected the
 claim in the current documents and left it standing in the archive with the
 correction noted. An overstatement quietly deleted teaches nothing.
+
+## 29 Aug 2026 — Iteration 4: enforce the schema rather than request it
+
+**Decision:** build a validator that checks every structured response against
+three mechanical rules, and wire it into the run so a failing response is sent
+back with its violations named.
+
+**The rules:** `status` must be one of the three permitted values; the `quote`
+must appear in the source file it names; every number in `source_figure` must
+appear inside its own quote. All three were already stated in the instruction.
+None of them had ever been checked.
+
+**Why a validator rather than another rule:** three iterations had asked the
+model to obey a schema and none had verified that it did. Measured
+retrospectively, Iteration 1 broke the schema five times, Iteration 2 twice,
+Iteration 3 four times. Iteration 3 made it worse: fixing the reasoning
+produced richer figures offered against the same single quotes. A fourth
+instruction would have been a fourth request. The defect was that nothing was
+enforcing anything.
+
+**What happened:** zero violations. Case 1 came back clean on the first
+attempt; Cases 2 and 3 each failed once and were corrected on the second.
+Every attempt is recorded in the result file with its own token count, so the
+correction is visible rather than hidden behind a clean final answer.
+
+**What it cost:** 3.5 times the time and 1.9 times the tokens of Iteration 3.
+Against the baseline, 4.4 times the time and 5.9 times the tokens. Nothing
+else moved — verdicts, traceability and attribution were already at ceiling.
+This iteration did not improve the answers. It made the citations
+trustworthy.
+
+**What it changed about the system:** the runtime now acts, evaluates its own
+output, and acts again on what the evaluation found. Every earlier iteration
+was a single call with a longer prompt.
+
+**The fault in it, and it is mine:** this iteration changed two things. The
+loop, and two instruction rules stating the same requirements the validator
+enforces. Every earlier iteration changed one. So the loop's independent
+contribution is not established by this run — Case 1 coming back clean first
+time may be the instruction alone.
+
+**The control that would settle it:** the same configuration with
+`MAX_ATTEMPTS = 1`, which keeps the instruction and the measurement but never
+lets the validator correct anything. It was attempted and lost. The free-tier
+quota is twenty requests per day and it ran out mid-run, and I then deleted
+the partial file rather than moving it aside — bypassing the overwrite guard
+I had built that morning for exactly this reason. Two of three cases had
+completed, and one of them had a violation, which suggests the instruction
+alone is not sufficient. I am not recording that as a result, because the
+file behind it no longer exists.
+
+**Consequence:** the control is pending a quota reset. Until it runs, the
+honest position is that Iteration 4 achieves zero violations, and how much of
+that the loop is responsible for is unmeasured.
+
+**Consequence for REPRODUCE.md:** the free-tier limit is twenty requests per
+day per model. A reader reproducing every run in this repository will exceed
+it. The guide said these runs "sit well within the free tier", which was true
+of two runs and is not true of five.
+
+**Evidence:** results/agent_v4.json, and the Iteration 4 row in CHANGELOG.md.
