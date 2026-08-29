@@ -64,6 +64,13 @@ Rules:
 knowledge about these companies.
 - If a figure is not in the sources, mark it not_found rather than estimating \
 it.
+- Where a claim compares against a benchmark that varies by tenure, category \
+or period, do not mark it verified because one row matches. State the full \
+range across the sources, name the specific rate you are comparing against, \
+and say why that one.
+- Before assessing a claim that depends on a ratio — a yield, a payout, a \
+price to book, a growth rate — compute it from the published figures and show \
+the arithmetic. Do not assess the claim without it.
 - Show the arithmetic for anything computed, e.g. "1200 / 40000 = 0.03 = 3%".
 - If "computed" has no entries, return it as an empty object {}.
 - Never advise buying or selling. Describe what the evidence shows and stop.\
@@ -71,7 +78,7 @@ it.
 
 # Single source of truth for this run's identity. The output filename and the
 # "run" label in the JSON both derive from it, so they cannot drift apart.
-RUN_NAME = "agent_v2"
+RUN_NAME = "agent_v3"
 
 CASES_PATH = Path("cases.json")
 RESULTS_PATH = Path("results") / f"{RUN_NAME}.json"
