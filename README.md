@@ -17,6 +17,12 @@ Gathering the information, analysing it, and comparing one company against
 another takes hours they do not have, or hours they would rather spend on
 something else.
 
+I was one of them. I invested on NEPSE from 2021 to 2023, trading mostly on
+technical analysis with some basic fundamental research. Charts tell you
+what a price has done. They tell you nothing about whether a declared
+dividend is real, whether a yield beats a deposit, or whose growth figure is
+being quoted. This is not a tool I designed for someone else's problem.
+
 ## Current bottleneck
 
 They act on advice received from someone else, without validating it. That
@@ -25,13 +31,20 @@ promoted, or what the person promoting it stands to gain. And they are
 usually unaware of the macro conditions that determine whether any stock
 does well.
 
-During the recent bear trend this was decisive. As commercial bank
-liquidity declined, banks raised deposit rates — individual fixed deposits
-reached 12.133% in Ashoj 2079, remittance deposits 13.133%, with some banks
+During the last bear trend this was decisive. As commercial bank liquidity
+declined, banks raised deposit rates — individual fixed deposits reached
+12.133% in Ashoj 2079, remittance deposits 13.133%, with some banks
 offering as much as 15%. Money flowed out of the capital market and into
 the banks, and the market fell for a sustained period. Investors who did
 not follow the connection between deposit rates and NEPSE lost money they
 could have moved.
+
+That was 2022 into 2023, and it is history rather than a description of
+now. Deposit rates today run from 2.75% to 4.55%, and the money that left
+the market for the banks has no such reason to stay there. It is here
+because it is why I understand this problem: I invested through that period
+and exited in 2023, and the calculation I was making by hand — is this
+dividend worth more than a deposit — is the one this tool performs.
 
 ## Why solving it is valuable
 
@@ -42,12 +55,14 @@ narrower: it puts the evidence in front of the investor before the
 decision, and leaves the decision with them.
 
 What makes that worth doing is that the claims circulating in this market
-are rarely false. A company really did declare a 12.50% dividend. The
-sector's profit really did rise 32%. Deposit rates really did reach 15%.
-Every figure survives checking. What is missing is the qualifier that gives
-it meaning — 12.50% of par value rather than of the market price, which is
-a yield of 2.31% on what you actually pay; 32% for the sector rather than
-for that company; 15% on remittance deposits rather than ordinary ones. The
+are rarely false. A company really did declare a 30% dividend — in 2078/79,
+three years before the claim that quotes it. The sector's profit really did
+rise 32%. Deposit rates really did reach 15%. Every figure survives
+checking. What is missing is the qualifier that gives it meaning — the
+fiscal year the 30% belongs to, and that a dividend is a percentage of par
+value rather than of the market price, which makes this year's 12.50% a
+yield of 2.31% on what you actually pay; 32% for the sector rather than for
+that company; 15% on remittance deposits rather than ordinary ones. The
 claim is true and the conclusion does not follow from it, and from the
 inside those two situations feel identical.
 
@@ -86,12 +101,13 @@ company plus `macro.md` for the deposit-rate benchmark. Each case in
 
 - **Claude Code (Sonnet 5)** — development agent. Built `cases.json`,
   `baseline.py`, `agent.py` and `requirements.txt`, and diagnosed the TLS
-  certificate problem. 29 August 2026.
+  certificate problem. 28–29 August 2026.
 - **Gemini API, model `gemini-3.6-flash`** — the runtime model this system
   calls to assess claims. Used identically by the baseline and the agent.
   Not a development tool.
 - **Claude (Opus 5), via chat** — problem selection, scoping, review of
-  agent output, and drafting of documentation. 28–31 August 2026.
+  agent output, drafting of documentation, and `check_results.py`.
+  28–31 August 2026.
 - **Gemini CLI** — used once on 28 August to verify trajectory export
   before the competition began. Not used to build this project.
 - **Gemini (free web version)** — used to locate candidate sources for the
@@ -105,7 +121,17 @@ company plus `macro.md` for the deposit-rate benchmark. Each case in
 
 Three synthetic claims, written by me and modelled on the shape of
 investment commentary circulating publicly. My own verdict and reasoning
-for each is recorded in `CASES.md`, written before either system was run.
+for each is recorded in `CASES.md`.
+
+Those verdicts were written before either system was run, with one
+correction made afterwards: Case 1 was revised once, from the source
+document rather than from either system's output. The change and its effect
+on the measurements are recorded in `DECISIONS.md` and disclosed in
+`REPRODUCE.md`.
+
+How each score is counted, and what it does and does not establish, is set
+out at the top of `CHANGELOG.md`. The per-case timings and token counts can
+be recomputed from the result files with `check_results.py`.
 
 ## Improvement changelog
 
@@ -130,6 +156,10 @@ worked and that agent traces could be exported before the competition began.
 That trajectory file has since been renamed to
 `trajectory-00-gemini-setup-test.json` for clarity. The rename is visible in
 the commit history.
+
+The original planning brief, written on the evening of 28 August before the
+market was chosen, is preserved unedited as `PLAN-2026-08-28.md`. Where it
+diverges from what was actually built, the divergence is the record.
 
 Everything else — the sources, the evaluation cases, both scripts, the
 results and every document in this repository — was built between 28 and 31
