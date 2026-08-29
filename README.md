@@ -197,6 +197,25 @@ assertions, so an arithmetic error in the calculation that decides a case
 would pass every rule. That one is mechanically checkable and simply is not
 checked.
 
+The validator is itself tested now — `test_validate.py`, twenty-three tests,
+no API key required. Writing those tests found four further limits that
+reading the code had not. Rule 2 inspects only quotes that exist, so an
+assertion carrying no quote is never flagged; that would matter for a
+**verified** or **contradicted** verdict, though not for **not_found**, which
+has nothing to quote. Every verified and contradicted assertion in every run
+was checked separately and all of them carry one, so the gap is real but
+unexercised. Rule 3's number matching then goes wrong in three ways: it
+matches substrings, so a figure of 2.31 is satisfied by a quote containing
+12.31; it is exact about separators, so `4,839,903,472` is not found in a
+quote writing the same number as `4839903472`; and its pattern is greedy, so
+a figure listing several numbers yields tokens carrying their punctuation —
+`5,` rather than `5` — which no quote contains. The first lets a wrong figure
+through. The other two flag right ones. None of the four was fixed, because
+every run was scored under the current rules and the correction loop was
+driven by them — tightening a rule now would re-score five runs against a
+contract the agent was never given. The tests pin the behaviour instead, and
+fail if it changes.
+
 Two further questions are open. The model still breaks its own schema on the
 first attempt — two of three cases needed correcting in the final run — so
 the loop is repairing behaviour rather than the model getting it right. And
