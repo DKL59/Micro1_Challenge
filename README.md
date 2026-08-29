@@ -17,7 +17,7 @@ Gathering the information, analysing it, and comparing one company against
 another takes hours they do not have, or hours they would rather spend on
 something else.
 
-I was one of them. I invested on NEPSE from 2021 to 2023, trading mostly on
+I invested on NEPSE from 2021 to 2023, trading mostly on
 technical analysis with some basic fundamental research. Charts tell you
 what a price has done. They tell you nothing about whether a declared
 dividend is real, whether a yield beats a deposit, or whose growth figure is
