@@ -682,3 +682,70 @@ it. The guide said these runs "sit well within the free tier", which was true
 of two runs and is not true of five.
 
 **Evidence:** results/agent_v4.json, and the Iteration 4 row in CHANGELOG.md.
+
+## 30 Aug 2026, early hours — The validator was tested, and its gaps pinned rather than fixed
+
+**Decision:** write tests for `validate.py`, and record the weaknesses they
+found instead of correcting them.
+
+**Options considered:** ship the validator untested; test it and fix
+everything the tests exposed; test it and pin the current behaviour with
+tests that fail if it changes.
+
+**Why test it at all:** the validator became load-bearing in Iteration 4.
+The schema-violation column in CHANGELOG.md is its output, the retrospective
+scores for Iterations 1 to 3 are its output, and the correction loop is
+driven by it. Nothing had ever checked that its three rules work. The
+challenge brief asks for a solution that is correct, reproducible, testable
+and clearly explained, and there was no test anywhere in this repository.
+
+**What the tests found:** four defects, none of which reading the code had
+surfaced.
+
+Rule 2 inspects only quotes that exist, so an assertion carrying no quote is
+never flagged. That is correct for `not_found`, which has nothing to quote,
+and a hole for `verified` or `contradicted`.
+
+Rule 3's number matching goes wrong three ways. It matches substrings, so a
+figure of 2.31 is satisfied by a quote containing 12.31. It is exact about
+separators, so `4,839,903,472` is not found in a quote writing the same
+number as `4839903472`. And its pattern is greedy over `[\d,]*`, so a figure
+listing several numbers yields tokens carrying their punctuation — `5,`
+rather than `5` — which no quote contains. The first admits a wrong figure.
+The other two reject right ones.
+
+**What was checked before deciding:** the first gap could have hollowed out
+the headline result — a run could in principle reach zero violations by
+omitting quotes rather than by getting them right. Every assertion in all
+four agent runs was inspected. Every `verified` and every `contradicted`
+assertion carries a quote, and `agent_v4` quotes even its `not_found`
+assertions, where none is owed. The gap is real and unexercised.
+
+**Why not fix them:** every run in this repository was scored under the
+current rules, and Iteration 4's correction loop was driven by them.
+Tightening a rule now would re-score five runs against a contract the agent
+was never given, and three of those runs cannot be re-run at all, because
+their sources and instructions no longer exist. A stricter validator applied
+retrospectively would not be a better measurement of the same thing. It
+would be a different measurement, reported as though it were the same one.
+
+**How the decision is enforced:** four tests named `test_known_gap_*` assert
+the current behaviour, so tightening any rule makes them fail. The failure is
+the reminder to update the failure-mode section of README.md alongside the
+code, rather than leaving the documentation describing a validator that no
+longer exists.
+
+**Overruled:** my own assumption, never stated because it never occurred to
+me to state it, that the validator was the one component that could not be
+wrong. Three mechanical rules, no model in the loop, a hundred lines. It has
+four defects, and one of them lives in a regular expression I had read
+several times without noticing that `\d[\d,]*` swallows a trailing comma.
+The component built to check everything else was the only thing in the
+project nothing checked.
+
+**Consequence:** `test_validate.py` runs with no API key, no network and no
+dependencies, and is now a step in REPRODUCE.md. A judge can execute it in
+five seconds. The four gaps are described in README.md's failure-mode
+section and referenced from the metric definition in CHANGELOG.md.
+
+**Evidence:** `test_validate.py`, twenty-three tests, all passing.
