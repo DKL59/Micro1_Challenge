@@ -43,9 +43,9 @@ That was 2022 into 2023, and it is history rather than a description of
 now. Deposit rates today run from 2.75% to 4.55% on ordinary individual
 deposits, and up to 5.55% on remittance-linked ones, and the money that
 left the market for the banks has no such reason to stay there. It is here
-because it is why I understand this problem: I invested through that period
-and exited in 2023, and the calculation I was making by hand — is this
-dividend worth more than a deposit — is the one this tool performs.
+because it is why I understand this problem: the calculation I was making
+by hand — is this dividend worth more than a deposit — is the one this tool
+performs.
 
 ## Why solving it is valuable
 
@@ -79,6 +79,13 @@ they are deciding on.
 
 See REPRODUCE.md.
 
+One thing to be clear about: this is an evaluation harness, not a product.
+Checking a new claim means adding it to `cases.json` and assembling the
+source file it should be checked against. There is no interface, and the
+person described above could not use it as it stands. What the weekend
+bought was evidence that the method works and a measurement of what it
+costs — not something anyone can pick up.
+
 ## Agent instructions
 
 The instruction sent to the model is defined as the `INSTRUCTION` constant
@@ -93,12 +100,20 @@ at the top of each script, so it can be read without running anything.
   benchmark that varies by tenure, category or period, state the full range
   and name the specific rate being compared against rather than marking it
   verified because one row matches; compute any ratio the claim turns on
-  before assessing it; show the arithmetic; and never advise buying or
-  selling. The range and ratio rules were added in Iteration 3;
-  CHANGELOG.md records what they changed.
+  before assessing it; show the arithmetic; use only the three permitted
+  status values; every number in a figure must appear in the quote beside
+  it; and never advise buying or selling.
 
 `agent.py` imports `MODEL` from `baseline.py` so the two runs cannot drift
 onto different models.
+
+Since Iteration 4 the response is not simply accepted. `validate.py` applies
+three mechanical rules to every assertion — the status must be permitted, the
+quote must appear in the source file it names, and every number in a figure
+must appear inside its own quote. A response that breaks any of them is sent
+back with its violations named, up to three attempts. Every attempt is
+recorded in the result file with its own token count, so a correction is
+visible in the evidence rather than hidden behind a clean final answer.
 
 The source documents the agent reads are in `sources/` — one file per
 company plus `macro.md` for the deposit-rate benchmark — and contain only
@@ -110,17 +125,17 @@ conclusions back as evidence. `notes/README.md` records what moved and why.
 
 ## Tools disclosed
 
-- **Claude Code (Sonnet 5)** — development agent. Built `cases.json`,
-  `baseline.py`, `agent.py` and `requirements.txt`, and diagnosed the TLS
-  certificate problem. 28–29 August 2026.
+- **Claude Code (Sonnet 5)** — development agent. Built the first versions
+  of `cases.json`, `baseline.py`, `agent.py` and `requirements.txt`, and
+  diagnosed the TLS certificate problem. 28–29 August 2026.
 - **Gemini API, model `gemini-3.6-flash`** — the runtime model this system
   calls to assess claims. Used identically by the baseline and the agent.
   Not a development tool.
 - **Claude (Opus 5), via chat** — problem selection, scoping, review of
-  agent output, drafting of documentation, `check_results.py`, the overwrite
-  guards in both scripts, the Iteration 2 rewrite of `sources/` and
-  `notes/`, and the two instruction rules added in Iteration 3.
-  28–31 August 2026.
+  agent output, drafting of documentation, `check_results.py`, `validate.py`,
+  the overwrite guards in both scripts, the Iteration 2 rewrite of `sources/`
+  and `notes/`, the instruction rules added in Iterations 3 and 4, and the
+  validation loop. 28–31 August 2026.
 - **Gemini CLI** — used once on 28 August to verify trajectory export
   before the competition began. Not used to build this project.
 - **Gemini (free web version)** — used to locate candidate sources for the
@@ -130,8 +145,9 @@ conclusions back as evidence. `notes/README.md` records what moved and why.
   that check. One summary it produced cited article titles that do not
   exist. 29 August 2026.
 
-Session transcripts for each agent are in `trajectories/`, with a manifest
-explaining what each file covers and recording one redaction.
+Session transcripts for the coding agent are in `trajectories/`, with a
+manifest explaining what each file covers, why the chat-based work has no
+tool-call trajectory, and recording one redaction.
 
 ## Evaluation
 
@@ -146,9 +162,10 @@ on the measurements are recorded in `DECISIONS.md` and disclosed in
 `REPRODUCE.md`.
 
 How each score is counted, and what it does and does not establish, is set
-out at the top of `CHANGELOG.md`. The per-case timings, token counts and
-verdict agreement can be recomputed from the result files with
-`check_results.py`.
+out at the top of `CHANGELOG.md`. Two of the four metrics are recomputable
+from the result files without an API key: `check_results.py` gives per-case
+timings, token counts and verdict agreement; `validate.py` gives the schema
+violation count for any run.
 
 ## Improvement changelog
 
@@ -156,45 +173,43 @@ See CHANGELOG.md.
 
 ## Main failure mode
 
-The system treats its instruction as a request rather than a contract, and
-nothing checks the result.
+The system can now prove a citation is well-formed. It cannot tell whether
+the citation is apt.
 
-Iteration 2 exposed a clear failure: the agent verified numbers without
-verifying claims. Told "Bank FD is giving only 4%", it found one rate-card
-row reading 4.00%, marked the assertion verified, and stopped. That 4.00%
-is one row from a range running 2.75% to 5.55% across tenures and
-categories. Iteration 3 fixed that with two rules, and on the one run since,
-it worked: the agent now states the full range, names the rate it is
-comparing against, and computes the yield before comparing anything to it.
+Since Iteration 4, every quote in the final run exists in the file it names,
+and every number in a figure appears in the quote beside it. That is checked
+in code before the answer is accepted, not requested in a prompt and hoped
+for. The violation count went from four to zero.
 
-What replaced it is narrower and more structural. Three symptoms, all from
-the same cause:
+What the validator cannot check is whether the quoted line actually supports
+the assertion made about it. Iteration 3 produced this on Case 2: it marked
+"Bonus shares provide free shares to investors." as **contradicted** and
+quoted the row showing NIC Asia paid no dividend in 2081/2082. That row is
+real, it is in the named file, and the figure quoted appears in it. It passes
+all three rules. It also does not address the claim, which is about what a
+bonus share is, not about whether this company issued one.
 
-- Told not to mark such a claim verified, the agent returned
-  `"status": "partly supported"` — a verdict-level value in a field the
-  schema restricts to `verified`, `contradicted` or `not_found`. The rule
-  forbade an answer without supplying an alternative, so it invented one.
-- Told to compute ratios, it computed one on a case that turns on no ratio,
-  reporting a dividend yield of `0.00 / 308.10 = 0.00 = 0%`.
-- Across all three runs it has reported several figures against a single
-  quote — most recently three dividend percentages backed by one table row.
-  Two changes, to the sources and to the instruction, have not touched this.
+So the guarantee is narrower than it looks. Every figure offered as coming
+from a source is traceable, and none is invented. Two things sit outside it.
+Whether the traced line is the *right* line remains a human judgement. And
+the `computed` block is not checked at all — the validator reads only the
+assertions, so an arithmetic error in the calculation that decides a case
+would pass every rule. That one is mechanically checkable and simply is not
+checked.
 
-The common thread is that the schema is stated in a prompt and enforced
-nowhere. The output is parsed as JSON and checked for a verdict; no code
-verifies that a status is one of the three permitted values, that a quote
-appears verbatim in the file it names, or that the quote contains the figure
-it is offered for. Every one of those is mechanically checkable, and none of
-them is checked.
+Two further questions are open. The model still breaks its own schema on the
+first attempt — two of three cases needed correcting in the final run — so
+the loop is repairing behaviour rather than the model getting it right. And
+Iteration 4 changed two things at once, the loop and two instruction rules,
+so how much of the zero belongs to the loop is not established. The control
+run that would settle it is written and waiting on a quota reset.
 
-So the next change is not another rule. It is a validator: reject a response
-whose status is not permitted, whose quote does not appear in the named
-source, or whose figure does not appear in its own quote — and make the agent
-answer again. That would convert three of this project's stated guarantees
-from things the prompt asks for into things the system enforces.
-
-That is not built. It is the clearest next step and I am recording it rather
-than claiming it.
+The next steps are of very different kinds. Checking the arithmetic in
+`computed` is a few lines of code and would close the gap above. Checking
+whether a quote is responsive to the assertion it is offered for cannot be
+done mechanically at all — it needs a second model to judge it, which is a
+different system with a different set of failure modes, including the obvious
+one that it would be a model grading a model.
 
 ## Hot take
 
@@ -214,6 +229,12 @@ survives is the capability. Whatever disappears was your own work, reflected
 back at you. When I did that, the attribution catch held and a verdict I was
 proud of fell over. Iteration 3 earned it back, with two rules that made the
 agent do the arithmetic instead of reading it off a page I had written.
+
+The same lesson applied again one level up. When I finally built something to
+check whether the output obeyed its own schema, it turned out three
+iterations had been quietly breaking it — five violations, then two, then
+four — and nobody had noticed, because nothing had ever looked. A rule stated
+in a prompt is a request. Only code makes it a contract.
 
 And one thing I did not expect. Every wrong number in this project's
 documentation was put there by a human. The 30% dividend, the 2-out-of-3
