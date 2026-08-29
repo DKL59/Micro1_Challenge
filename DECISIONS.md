@@ -468,6 +468,18 @@ readable by me and wrote my working into them, and that working then
 became the agent's evidence. A grounding corpus is not documentation.
 Anything in it that reads like an answer will be returned as one.
 
+**One thing had to replace the signposts rather than simply vanish.**
+`sources/nica.md` carried a heading reading "Not yet sourced" above the
+absent bonus announcement. Deleting it outright would have made absence
+ambiguous — a reader could not tell whether the company announced nothing or
+whether I had collected nothing. So each source file now opens with a
+coverage line stating what it contains and what it does not. That is metadata
+about the corpus, not an answer to a case: it lets the agent reason that a
+file covering dividend history but not announcements cannot confirm an
+imminent announcement, without being told that conclusion. Iteration 2
+confirmed the distinction works — on Case 2 the agent quoted the coverage
+line to justify `not_found`.
+
 **Evidence:** results/agent_v1.json, and the caveat recorded against
 Iteration 1 in CHANGELOG.md.
 
