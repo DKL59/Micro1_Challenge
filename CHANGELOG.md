@@ -2,11 +2,15 @@
 
 How the solution evolved, from the simple baseline through to the final result.
 
-**How these are measured.** Three cases, scored by hand against the result
-files.
+**How these are measured.** Three cases. Verdict agreement is checked by
+script for any run returning structured output; the other two metrics are my
+own judgement against the result files.
 
 - **Verdict agreement (out of 3)** — does the system's overall verdict match
-  the verdict I recorded in CASES.md for that case.
+  the verdict I recorded in CASES.md for that case. `check_results.py`
+  compares each structured verdict against the `my_verdict` field in
+  `cases.json` and prints the count. The baseline returns free text, so its
+  verdicts cannot be parsed and were scored by hand.
 - **Figures traceable to a source (out of 3)** — for a case to count, every
   figure the system reports must name the source file it came from and quote
   a line that actually appears in that file. A case with one invented number
@@ -21,8 +25,8 @@ files.
   company's own. There is one opportunity to catch it, so the denominator is
   one. Read the Iteration 1 caveat before relying on this score.
 
-Scoring is my own judgement against the recorded verdicts in CASES.md, on
-three cases. That is enough to show a difference this large and not enough to
+Where scoring is my own judgement it is stated as such, and it rests on three
+cases. That is enough to show a difference this large and not enough to
 estimate its size. I have reported it as a difference, not a percentage.
 
 | Stage | What I tried and why | Evidence | Decision / Learning |

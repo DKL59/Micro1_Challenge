@@ -63,17 +63,21 @@ cannot drift onto different models.
 
 Two parts, because two different kinds of claim are being checked.
 
-The arithmetic is checked by script. This reads the result files and
-recomputes the per-case timings and token counts quoted in CHANGELOG.md:
+The reproducible part is checked by script. This reads the result files and
+`cases.json`, recomputes the per-case timings and token counts quoted in
+CHANGELOG.md, and scores verdict agreement for any run that returns
+structured output:
 
     python check_results.py
 
 It needs no API key and no network, and it writes nothing.
 
-The judgements are checked by hand. Compare the two result files against the
-verdicts and reasoning recorded in `CASES.md`. How each score is counted, and
-what each one does and does not establish, is set out under "How these are
-measured" at the top of CHANGELOG.md.
+The rest is human judgement. The baseline returns free text, so its verdicts
+cannot be parsed and were scored by hand. Figures traceable to a source and
+attribution errors caught are judgements throughout. For those, compare the
+result files against the verdicts and reasoning recorded in `CASES.md`. How
+each score is counted, and what it does and does not establish, is set out
+under "How these are measured" at the top of CHANGELOG.md.
 
 Those verdicts are my own assessments, written before either system was run,
 with one correction made afterwards. Case 1's verdict was revised from
