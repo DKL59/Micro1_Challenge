@@ -36,14 +36,30 @@ Bash:
 ## Run the solution
 
 The agent sends the same claims together with the source documents, and
-requires a source quote for every figure:
+requires a source quote for every figure.
+
+Run this in the same terminal session as the baseline, so that
+GEMINI_API_KEY is still set:
 
     python agent.py
+
+Both scripts import the model name from the same place, so the two runs
+cannot drift onto different models.
 
 ## Run the evaluation
 
 Compare the two result files against the verdicts and reasoning recorded in
-`CASES.md`, which are my own assessments, made before either system was run.
+`CASES.md`.
+
+Those verdicts are my own assessments, written before either system was run,
+with one correction made afterwards. Case 1's verdict was revised from
+"partly supported" to "unsupported" during a file audit, when checking the
+source showed Nabil declared a 12.50% cash dividend rather than the higher
+figure I had assumed. The revision came from the source document, not from
+either system's output. Both result files were re-scored against the
+corrected verdict, and the correction moved both systems equally, so the
+comparison between them is unaffected. The change is recorded in
+`DECISIONS.md`.
 
 ## Expected output
 
