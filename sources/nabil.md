@@ -3,11 +3,14 @@
 Retrieved: 29 August 2026
 Market figures as of: 27 August 2026
 
+Coverage: market data, capital structure, fundamentals and dividend history
+as published on NEPSE, ShareSansar and Hamroshare. Corporate announcements
+and board disclosures are not included.
+
 Sources:
 - Dividend, market price, capital: https://www.sharesansar.com/company/nabil
 - EPS, net worth per share, P/E: https://www.nepalstock.com/company/detail/131
 - Dividend history, independent corroboration: https://hamroshare.com.np/company/NABIL/dividends
-- Benchmark deposit rates: https://www.nicasiabank.com/interest-rates/
 
 ## Market data
 
@@ -50,42 +53,16 @@ Sources:
 | 2074/2075 | 12.00% | 22.00% | 34.00% |
 | 2073/2074 | 30.00% | 18.00% | 48.00% |
 
-## Verification notes
+## Source agreement
 
-Two independent sources agree on the recent dividend record:
+ShareSansar and Hamroshare report the same figures for the three most recent
+fiscal years.
 
-| Fiscal year | ShareSansar | Hamroshare | Agreement |
-|---|---|---|---|
-| 2081/2082 | 12.50% cash, book close 2025-12-31 | 12.50% cash, book close 2025-12-31 | Match |
-| 2080/2081 | 10.00% | 10.00% | Match |
-| 2079/2080 | 11.00% | 11.00% | Match |
+| Fiscal year | ShareSansar | Hamroshare |
+|---|---|---|
+| 2081/2082 | 12.50% cash, book close 2025-12-31 | 12.50% cash, book close 2025-12-31 |
+| 2080/2081 | 10.00% | 10.00% |
+| 2079/2080 | 11.00% | 11.00% |
 
-Note on source framing: Hamroshare reports Nabil as "averaging 36.97% per
-year" across 15 fiscal years, with peaks of 65% in 2069/70 and 2070/71. The
-current figure is 12.50%, a yield of 2.31% on market price. The average is
-accurate and misleading as a guide to the present.
-
-Trend: total dividend has fallen from 48% (2073/74) to 12.50% (2081/82).
-No bonus shares issued in the last three fiscal years.
-
-## Computed
-
-- Dividend per share: Rs 12.50
-- Dividend yield on market price: 12.50 / 540.20 = 2.31%
-- Payout ratio: 12.50 / 21.89 = 57.1%
-- Price to book: 540.20 / 231 = 2.34x
-- Earnings yield: 21.89 / 540.20 = 4.05%
-
-## Cross-checks
-
-- P/E: 540.20 / 21.89 = 24.68 against published 24.73 — consistent within rounding
-- Paid-up value / listed shares = Rs 100 par — consistent with NEPSE convention
-
-## Benchmark comparison
-
-Current bank fixed deposit rates for individuals: 2.75% (shorter terms) to
-4.00% (five years and above), effective 1 Shrawan 2083 (July 2026).
-Source: NIC Asia Bank, https://www.nicasiabank.com/interest-rates/
-
-Nabil's dividend yield of 2.31% is below the entire deposit range, and the
-share carries price risk a deposit does not.
+Hamroshare additionally reports a 15-year average of 36.97% per year, with
+peaks of 65% in 2069/70 and 2070/71.
