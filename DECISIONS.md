@@ -7,13 +7,18 @@ that were reversed and why. Entries are in the order they were made.
 
 **Decision:** NEPSE.
 
-**Options considered:** NEPSE, where I have two years of personal
-retail investing experience, versus US-listed companies, where
-filings are free and machine-readable through EDGAR.
+**Options considered:** NEPSE, where I invested personally from 2021
+to 2023, versus US-listed companies, where filings are free and
+machine-readable through EDGAR.
 
-**Why:** Familiarity with the market. I invested on NEPSE personally
-from 2021 to 2023, so I know how these claims
-circulate and I know the local conventions that make them
+**Why:** Familiarity with the market, and first-hand familiarity with
+the gap this tool addresses. I invested on NEPSE from 2021 to 2023,
+trading mostly on technical analysis with some basic fundamental
+research. That is exactly the position the tool is built for: someone
+reading charts has no way to judge whether a dividend figure is real,
+whether a yield beats a deposit, or whose growth number is being
+quoted. I know how these claims circulate because I was in the
+audience for them, and I know the local conventions that make them
 misleading: dividends quoted against Rs 100 par value rather than
 market price, bonus shares presented as free money, fiscal years
 stated in Bikram Sambat. In a market I had never invested in I would
