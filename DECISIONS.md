@@ -52,7 +52,7 @@ The parameters do not. Nepali filings do not follow US GAAP or
 EDGAR's structure. The macro comparison depends on NRB policy rates
 and local deposit rates. Most importantly, NEPSE is long-only: a
 retail investor in a downtrend has no instrument to profit from the
-decline, which is why I exited my own positions in 2021. A US
+decline, which is why I exited my own positions in 2023. A US
 investor can short or hedge, so that structural argument does not
 hold there.
 
@@ -230,19 +230,20 @@ nobody can tell whether a different result came from the code or
 from the model — but it should not be presented as though it made
 the run permanently repeatable.
 
-**Consequence:** REPRODUCE.md names the model under Versions. If the
-model is retired, results will differ from mine, and the file should
-say so rather than leaving a reader to discover it through a 404.
+**Consequence:** REPRODUCE.md names the model under Versions and
+states that a retirement would change the results, so a reader meets
+that fact before they meet a 404.
 
 ## 29 Aug 2026 — Protecting the comparison from drift and from loss
 
 **Decision:** three safeguards. `agent.py` imports `MODEL` from
 `baseline.py` rather than declaring its own, so the two runs cannot
-drift onto different models. `agent.py` refuses to run if its output
-file already exists — `baseline.py` does not yet carry the same
-guard. And `check_results.py` recomputes the headline timings and
-token counts directly from the result files, so the figures quoted
-in CHANGELOG.md can be checked rather than trusted.
+drift onto different models. Both scripts refuse to run if their
+output file already exists. And `check_results.py` recomputes the
+headline timings and token counts directly from the result files,
+and scores verdict agreement against the verdicts recorded in
+`cases.json`, so the figures quoted in CHANGELOG.md can be checked
+rather than trusted.
 
 **Options considered:** declaring the model separately in each
 script and remembering to keep them in step; letting each run
@@ -265,7 +266,10 @@ file stops the run before it reaches the API.
 
 The third came from finding two wrong numbers by hand-checking. If
 hand arithmetic produced errors twice, it should not be the last
-word on any figure that a script can recompute.
+word on any figure a script can recompute. Verdict agreement is now
+machine-scored for any run returning structured output; the baseline
+returns free text and remains hand-scored, and the script says so
+rather than guessing.
 
 **Consequence for the design:** a results file is evidence, not
 output. It is never hand-edited and never overwritten. To change
@@ -300,14 +304,16 @@ cases. What separates them is whether the answer rests on anything.
 
 Two gaps came out of that.
 
-**Verification.** Every number the baseline produced was invented. It
-guessed a market price of "NPR 600 or more" and concluded the yield
-"might only be 3% to 5%", when the real figure is 12.50 / 540.20 =
-2.31% — below the lowest deposit rate surveyed. It was right by
-argument and wrong on the arithmetic, and it had no way to tell the
-difference, which means neither does the user. More precisely: the
-baseline never disputes a premise. It accepts every figure in the
-claim and argues only about what the figure means.
+**Verification.** Every company-specific figure the baseline produced
+was invented. It had the Rs 100 par value convention right from
+general knowledge, and guessed everything else: a market price of
+"NPR 600 or more" and a yield that "might only be 3% to 5%", when the
+real figure is 12.50 / 540.20 = 2.31% — below the lowest deposit rate
+surveyed. It was right by argument and wrong on the arithmetic, and
+it had no way to tell the difference, which means neither does the
+user. More precisely: the baseline never disputes a premise. It
+accepts every figure in the claim and argues only about what the
+figure means.
 
 **Attribution.** On the challenging case it reached the right verdict
 for entirely different reasons than mine — value trap risk, earnings
@@ -390,8 +396,8 @@ what caused it, and what it did to the measurements.
 that the declared figure was genuine and that the claim was misleading
 only in how it framed a true number, so I judged it partly supported.
 During the file audit I checked the source. Nabil declared a 12.50% cash
-dividend and no bonus shares. The quoted figure is not a true number in
-a misleading frame; it is contradicted by the source outright. The
+dividend and no bonus shares for FY 2081/2082. The quoted figure is
+contradicted by the source for the year the claim is about, and the
 verdict became unsupported.
 
 **Why the timing does not invalidate the measurement:** a ground truth
@@ -408,19 +414,24 @@ meet the scores.
 **What it cost:** a finding. I had recorded a third gap, "discrimination"
 — that the baseline condemns a whole claim rather than separating the
 accurate part from the misleading part — and built it on the assumption
-that the 30% was real. Once the figure was checked, the gap dissolved:
-there is no accurate part to separate. I have removed it rather than
-leave a conclusion standing on a premise I never verified. Two gaps, not
-three.
+that the 30% was real for the current year. Once the figure was checked,
+the gap dissolved. I have removed it rather than leave a conclusion
+standing on a premise I never verified. Two gaps, not three.
 
 **Overruled:** myself, and my assistant, who asserted at one point that
-Nabil had genuinely declared 30%. Neither of us checked it against the
-source file that was already sitting in the repository.
+Nabil had genuinely declared 30% this year. Neither of us checked it
+against the source file that was already sitting in the repository.
 
 **Worth noting:** the error is a figure taken on trust and never traced
 to its source — which is the exact failure this project was built to
 catch. It survived a day of work on a tool designed to detect it, and
 was caught only by a line-by-line audit against the sources.
+
+**Later refinement, before the Iteration 2 run:** auditing the source
+files showed that 30.00% is Nabil's actual total dividend for FY
+2078/2079 — 18.50% bonus plus 11.50% cash. The claim quotes a real
+figure and drops the year. That is recorded in CASES.md. It sharpens
+the reasoning and does not change the verdict.
 
 ## 29 Aug 2026 — The source files answered the question for the agent
 
@@ -476,11 +487,11 @@ the transcript untouched, rotate the key, and disclose the redaction in
 `trajectories/README.md`.
 
 **Why:** the ground rules require agent trajectories and require credentials
-to stay out of the submission. Those two requirements collide the moment a key
-touches a terminal an agent is recording. Dropping the file would satisfy the
-second rule by breaking the first. Redacting one string satisfies both, and
-saying so is what makes the rest of the file trustworthy — a transcript with
-an unexplained gap is worth less than one with a labelled one.
+to stay out of the submission. Those two requirements collide the moment a
+key touches a terminal an agent is recording. Dropping the file would satisfy
+the second rule by breaking the first. Redacting one string satisfies both,
+and saying so is what makes the rest of the file trustworthy — a transcript
+with an unexplained gap is worth less than one with a labelled one.
 
 **What it says about the process:** the sweep is a checklist step run before
 committing, added earlier the same day. It is the only reason this was caught.
