@@ -1,6 +1,0 @@
- ▐▛███▛█   Claude Code v2.1.251
-▝▜██████▀  Sonnet 5 · Claude Pro
-  ▝▝ ▝▝    ~\Micro1_Challenge
-
-  Tackle your toughest work with Opus 5. Switch anytime with /model.
-  +1 more · /status

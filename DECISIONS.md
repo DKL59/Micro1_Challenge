@@ -459,3 +459,33 @@ Anything in it that reads like an answer will be returned as one.
 
 **Evidence:** results/agent_v1.json, and the caveat recorded against
 Iteration 1 in CHANGELOG.md.
+
+## 29 Aug 2026 — A credential was found in a trajectory before it was committed
+
+**What happened:** while collecting the Claude Code session transcripts for
+submission, a pattern sweep of the repository found one live Gemini API key
+inside `trajectory-03-claude-code-session-3.jsonl`. Claude Code records
+everything typed into its terminal, and the key had been set there as an
+environment variable.
+
+**Options considered:** dropping that trajectory from the submission,
+redacting the single string, or editing the transcript more broadly.
+
+**Decision:** redact the key in the submitted copy, leave everything else in
+the transcript untouched, rotate the key, and disclose the redaction in
+`trajectories/README.md`.
+
+**Why:** the ground rules require agent trajectories and require credentials
+to stay out of the submission. Those two requirements collide the moment a key
+touches a terminal an agent is recording. Dropping the file would satisfy the
+second rule by breaking the first. Redacting one string satisfies both, and
+saying so is what makes the rest of the file trustworthy — a transcript with
+an unexplained gap is worth less than one with a labelled one.
+
+**What it says about the process:** the sweep is a checklist step run before
+committing, added earlier the same day. It is the only reason this was caught.
+Nothing else in the workflow would have surfaced it, and the key had been
+sitting in that file since the morning.
+
+**Consequence:** the sweep runs again immediately before submission, not only
+before commits.
