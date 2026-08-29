@@ -1,4 +1,5 @@
 .gemini/
+.claude/
 .env
 *.key
 *.pyc
