@@ -22,20 +22,25 @@ is read from an environment variable and is never stored in this repository.
 
 ## Before you run anything: the results files are evidence
 
-`results/` already contains the runs this project's claims are based on. Each
-script refuses to overwrite an existing results file, so a fresh run will stop
-immediately if its output already exists. That is deliberate: a results file
-backs a row in CHANGELOG.md, and silently replacing one would leave a claim
-with nothing behind it.
+`results/` already contains the four runs this project's claims are based on.
+Each script refuses to overwrite an existing results file, so a fresh run will
+stop immediately if its output already exists. That is deliberate: a results
+file backs a row in CHANGELOG.md, and silently replacing one would leave a
+claim with nothing behind it.
 
-To produce your own run without disturbing mine, either move the existing file
-aside, or change `RUN_NAME` at the top of the script you are running to a name
-of your own. The output filename and the run label inside the JSON both derive
-from that one constant.
+This means both scripts, run as they ship, will refuse. `baseline.py` ships
+with `RUN_NAME = "baseline"` and `agent.py` with `RUN_NAME = "agent_v3"`, and
+both of those files exist. To make your own run, change `RUN_NAME` at the top
+of the script to a name of your own. The output filename and the run label
+inside the JSON both derive from that one constant.
 
 ## Run the baseline
 
 The baseline sends each claim to the model with no documents and no context.
+
+`results/baseline.json` already exists, so change `RUN_NAME` at the top of
+`baseline.py` to something of your own — `baseline-mine`, say — before
+running, or the script will refuse.
 
 PowerShell:
 
@@ -48,8 +53,12 @@ Bash:
 
 ## Run the solution
 
-The agent sends the same claims together with the source documents, and
-requires a source quote for every figure.
+The agent sends the same claims together with the source documents. It must
+quote a source line for every figure, state the full range when comparing
+against a benchmark that varies by tenure or category, and compute any ratio
+the claim turns on before assessing it.
+
+Change `RUN_NAME` in `agent.py` the same way before running.
 
 Run this in the same terminal session as the baseline, so that
 GEMINI_API_KEY is still set:
@@ -70,7 +79,9 @@ structured output:
 
     python check_results.py
 
-It needs no API key and no network, and it writes nothing.
+It needs no API key and no network, and it writes nothing. If you produce a
+run under a new name, add that name to the `RUNS` list at the top of the
+script and it will be scored alongside the rest.
 
 The rest is human judgement. The baseline returns free text, so its verdicts
 cannot be parsed and were scored by hand. Figures traceable to a source and
@@ -82,27 +93,35 @@ under "How these are measured" at the top of CHANGELOG.md.
 Those verdicts are my own assessments, written before either system was run,
 with one correction made afterwards. Case 1's verdict was revised from
 "partly supported" to "unsupported" during a file audit, when checking the
-source showed Nabil declared a 12.50% cash dividend rather than the higher
-figure I had assumed. The revision came from the source document, not from
-either system's output. Both result files were re-scored against the
-corrected verdict, and the correction moved both systems equally, so the
-comparison between them is unaffected. The change is recorded in
-`DECISIONS.md`.
+source showed Nabil declared a 12.50% cash dividend for the year in question
+rather than the higher figure I had assumed. The revision came from the
+source document, not from either system's output. The two result files that
+existed at that point were re-scored against the corrected verdict, and the
+correction moved both systems equally, so the comparison between them is
+unaffected. The change is recorded in `DECISIONS.md`.
 
 ## Expected output
 
-The repository ships with `results/baseline.json` and `results/agent_v1.json`,
-the runs behind the figures in CHANGELOG.md.
+The repository ships with four result files, one per row in CHANGELOG.md:
+
+- `results/baseline.json` — the control condition, no documents
+- `results/agent_v1.json` — grounded, against the original source files
+- `results/agent_v2.json` — grounded, after my analysis was stripped out of
+  the sources into `notes/`
+- `results/agent_v3.json` — as above, plus the range and ratio rules in the
+  agent's instruction
 
 Each contains, per case: the case id, the exact prompt sent, the full model
-response, any error, and the time taken. The agent file additionally contains
+response, any error, and the time taken. The agent files additionally contain
 the parsed structured output, the source files used, and — inside each
-recorded prompt — the full text of the documents the agent was shown.
+recorded prompt — the full text of the documents the agent was shown. That
+last point matters: `agent_v1.json` still carries the source files as they
+were before my analysis was stripped out of them, so the change made in
+Iteration 2 can be read directly from the evidence rather than taken on
+trust.
 
-A fresh run of `agent.py` as shipped writes `results/agent_v2.json`, taken
-from `RUN_NAME` at the top of that file.
-
-Both scripts print progress to the terminal and confirm the file written.
+A fresh run writes `results/<RUN_NAME>.json`. Both scripts print progress to
+the terminal and confirm the file written.
 
 ## Versions
 
@@ -122,14 +141,19 @@ model rather than from the code.
 
 Three cases per run.
 
-- Baseline: mean 15.8s per case (14.9 / 19.4 / 13.2), about 1,832 tokens
-- Agent: mean 16.4s per case (25.8 / 11.4 / 12.1), about 5,338 tokens
+| Run | Mean time per case | Per-case times | Mean tokens per case |
+|---|---|---|---|
+| baseline | 15.8s | 14.9 / 19.4 / 13.2 | 1,832 |
+| agent_v1 | 16.4s | 25.8 / 11.4 / 12.1 | 5,338 |
+| agent_v2 | 15.3s | 15.0 / 14.3 / 16.6 | 4,805 |
+| agent_v3 | 20.3s | 24.2 / 18.5 / 18.1 | 5,620 |
 
-The per-case figures are given because with three cases a mean is fragile: the
-agent's mean is one slow case pulling two fast ones, and its median is 12.1s,
-below the baseline's 14.9s.
+The per-case times are given because with three cases a mean is fragile:
+agent_v1's mean is one slow case pulling two fast ones, and its median of
+12.1s sits below the baseline's 14.9s.
 
-Both runs together take under two minutes and sit well within the free tier.
+A baseline run plus one agent run takes under two minutes and sits well
+within the free tier.
 
 ## If you get SSL certificate errors
 

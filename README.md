@@ -89,8 +89,13 @@ at the top of each script, so it can be read without running anything.
 - `agent.py` — the same task, plus the required JSON schema and a set of
   rules: break the claim into separate assertions and check each one; every
   figure must come from the source documents; anything absent is marked
-  `not_found` rather than estimated; arithmetic must be shown; and the
-  system never advises buying or selling.
+  `not_found` rather than estimated; where a claim compares against a
+  benchmark that varies by tenure, category or period, state the full range
+  and name the specific rate being compared against rather than marking it
+  verified because one row matches; compute any ratio the claim turns on
+  before assessing it; show the arithmetic; and never advise buying or
+  selling. The range and ratio rules were added in Iteration 3;
+  CHANGELOG.md records what they changed.
 
 `agent.py` imports `MODEL` from `baseline.py` so the two runs cannot drift
 onto different models.
@@ -112,7 +117,9 @@ conclusions back as evidence. `notes/README.md` records what moved and why.
   calls to assess claims. Used identically by the baseline and the agent.
   Not a development tool.
 - **Claude (Opus 5), via chat** — problem selection, scoping, review of
-  agent output, drafting of documentation, and `check_results.py`.
+  agent output, drafting of documentation, `check_results.py`, the overwrite
+  guards in both scripts, the Iteration 2 rewrite of `sources/` and
+  `notes/`, and the two instruction rules added in Iteration 3.
   28–31 August 2026.
 - **Gemini CLI** — used once on 28 August to verify trajectory export
   before the competition began. Not used to build this project.
@@ -139,8 +146,9 @@ on the measurements are recorded in `DECISIONS.md` and disclosed in
 `REPRODUCE.md`.
 
 How each score is counted, and what it does and does not establish, is set
-out at the top of `CHANGELOG.md`. The per-case timings and token counts can
-be recomputed from the result files with `check_results.py`.
+out at the top of `CHANGELOG.md`. The per-case timings, token counts and
+verdict agreement can be recomputed from the result files with
+`check_results.py`.
 
 ## Improvement changelog
 
@@ -148,31 +156,45 @@ See CHANGELOG.md.
 
 ## Main failure mode
 
-The system verifies numbers. It does not reliably verify claims.
+The system treats its instruction as a request rather than a contract, and
+nothing checks the result.
 
-On Case 1 the claim says "Bank FD is giving only 4%". The agent searched the
-rate cards, found Nabil's five-to-ten-year row at 4.00%, and marked the
-assertion **verified**. The number is real. The claim is not: 4% is the
-best rate available at the longest tenure, from a range running 2.75% to
-4.55%, and the claim uses it to mean the most a deposit can pay. The agent
-matched a figure to a line and stopped.
+Iteration 2 exposed a clear failure: the agent verified numbers without
+verifying claims. Told "Bank FD is giving only 4%", it found one rate-card
+row reading 4.00%, marked the assertion verified, and stopped. That 4.00%
+is one row from a range running 2.75% to 5.55% across tenures and
+categories. Iteration 3 fixed that with two rules, and on the one run since,
+it worked: the agent now states the full range, names the rate it is
+comparing against, and computes the yield before comparing anything to it.
 
-It also stops short of arithmetic it has not been given. On the same case
-`computed` came back empty — it never worked out 12.50 / 540.20 = 2.31%, so
-it never discovered that Nabil's dividend yield falls below every deposit
-rate surveyed. That comparison decides the case, and it did not happen. In
-the previous iteration the answer was sitting in the source file; when it was
-removed, the agent did not reconstruct it.
+What replaced it is narrower and more structural. Three symptoms, all from
+the same cause:
 
-The consequence for a user is specific. A claim built on a real figure with
-the qualifier stripped off — the tenure, the fiscal year, the depositor
-category, the entity — can pass this system's checks. That describes most
-misleading investment claims, including two of the three in this evaluation.
+- Told not to mark such a claim verified, the agent returned
+  `"status": "partly supported"` — a verdict-level value in a field the
+  schema restricts to `verified`, `contradicted` or `not_found`. The rule
+  forbade an answer without supplying an alternative, so it invented one.
+- Told to compute ratios, it computed one on a case that turns on no ratio,
+  reporting a dividend yield of `0.00 / 308.10 = 0.00 = 0%`.
+- Across all three runs it has reported several figures against a single
+  quote — most recently three dividend percentages backed by one table row.
+  Two changes, to the sources and to the instruction, have not touched this.
 
-The fix is not a better model. It is a stricter instruction: require the
-system to state the full range and name the tenure and category it is
-comparing against, and to compute the yield before comparing anything to it.
-That is the next iteration, and it is not done.
+The common thread is that the schema is stated in a prompt and enforced
+nowhere. The output is parsed as JSON and checked for a verdict; no code
+verifies that a status is one of the three permitted values, that a quote
+appears verbatim in the file it names, or that the quote contains the figure
+it is offered for. Every one of those is mechanically checkable, and none of
+them is checked.
+
+So the next change is not another rule. It is a validator: reject a response
+whose status is not permitted, whose quote does not appear in the named
+source, or whose figure does not appear in its own quote — and make the agent
+answer again. That would convert three of this project's stated guarantees
+from things the prompt asks for into things the system enforces.
+
+That is not built. It is the clearest next step and I am recording it rather
+than claiming it.
 
 ## Hot take
 
@@ -190,7 +212,8 @@ So here is the test I would apply to any retrieval-augmented system, my own
 included: remove your conclusions from the corpus and run it again. Whatever
 survives is the capability. Whatever disappears was your own work, reflected
 back at you. When I did that, the attribution catch held and a verdict I was
-proud of fell over.
+proud of fell over. Iteration 3 earned it back, with two rules that made the
+agent do the arithmetic instead of reading it off a page I had written.
 
 And one thing I did not expect. Every wrong number in this project's
 documentation was put there by a human. The 30% dividend, the 2-out-of-3

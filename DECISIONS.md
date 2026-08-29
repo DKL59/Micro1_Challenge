@@ -403,13 +403,13 @@ verdict became unsupported.
 **Why the timing does not invalidate the measurement:** a ground truth
 adjusted after seeing results is worthless unless you can say what moved
 it. What moved this one was the source document, not either system's
-output. Both result files were then re-scored against the corrected
-verdict, and both moved identically — baseline and agent each went from
-2 of 3 to 3 of 3 on verdict agreement. That is confirmed rather than
-assumed: both files record "unsupported" on Case 1. The comparison
-between the two systems is therefore unaffected. The disclosure is in
-REPRODUCE.md so that anyone reproducing the numbers meets it before they
-meet the scores.
+output. The two result files that existed at that point were then
+re-scored against the corrected verdict, and both moved identically —
+baseline and agent each went from 2 of 3 to 3 of 3 on verdict agreement.
+That is confirmed rather than assumed: both files record "unsupported" on
+Case 1. The comparison between the two systems is therefore unaffected.
+The disclosure is in REPRODUCE.md so that anyone reproducing the numbers
+meets it before they meet the scores.
 
 **What it cost:** a finding. I had recorded a third gap, "discrimination"
 — that the baseline condemns a whole claim rather than separating the
@@ -531,10 +531,10 @@ Iteration 1 both numbers were sitting in the file waiting to be copied. The
 **What it cost:** verdict agreement fell from 3 of 3 to 2 of 3. Case 1 came
 back "partly supported" rather than "unsupported", because the agent marked
 "Bank FD is giving only 4%" as verified against a single rate-card row — the
-5-to-10-year tenure at Nabil — from a range running 2.75% to 4.55%. And
-`computed` came back empty: it never worked out 12.50 / 540.20 = 2.31%, so
-the comparison that decides the case never happened. In Iteration 1 that
-yield was handed to it.
+5-to-10-year tenure at Nabil — from a range running 2.75% to 4.55% on
+ordinary individual deposits. And `computed` came back empty: it never
+worked out 12.50 / 540.20 = 2.31%, so the comparison that decides the case
+never happened. In Iteration 1 that yield was handed to it.
 
 **Decision:** report both. The score that fell was propped up by my source
 files; the score that held is now worth something. A 3 of 3 built on a corpus
@@ -546,3 +546,78 @@ the same run where it caught Case 3 unaided. It is now the system's
 documented main failure mode rather than a hypothesis about one.
 
 **Evidence:** results/agent_v2.json, and the Iteration 2 row in CHANGELOG.md.
+
+## 29 Aug 2026 — Iteration 3: change the instruction, not the model
+
+**Decision:** fix the failure Iteration 2 exposed by adding two rules to the
+agent's instruction, and change nothing else.
+
+**Options considered:** a stronger model; more source material; multi-step
+prompting; or two targeted rules aimed at the specific defect.
+
+**Why:** the defect was specific and diagnosed. The agent marked "Bank FD is
+giving only 4%" verified because one rate-card row said 4.00%, and it never
+computed the yield the case turns on. Neither is a reasoning capacity the
+model lacks — Iteration 2 showed it deriving a price-to-book and a growth
+rate unprompted on another case. It simply was not asked. So the cheapest
+honest fix was to ask.
+
+**What changed:** two rules. Where a claim compares against a benchmark that
+varies by tenure, category or period, state the full range, name the rate
+being compared against, and say why that one — rather than marking the claim
+verified because a row matches. And before assessing a claim that turns on a
+ratio, compute it and show the arithmetic.
+
+**What happened:** verdict agreement returned to 3 of 3, and this time the
+reasoning is there to support it. Case 1's computed block contains
+12.50 / 540.20 = 2.31%, and the deposit assertion reports the range 2.75% to
+5.55% while naming the 4.00% five-to-ten-year rate as the specific comparator.
+
+**What it cost:** 33% more time and 17% more tokens than Iteration 2. It also
+introduced two new defects. The prohibition on marking such claims verified
+gave the agent nowhere to land, and it returned "partly supported" as an
+assertion status — a value the schema does not permit at that level. And the
+ratio rule fired mechanically on a case that turns on no ratio, producing a
+dividend yield of 0%.
+
+**What that says:** a rule that forbids something must also say what to do
+instead. And an instruction is a request, not a contract — nothing in this
+system checks that the returned status is one of the three permitted values.
+The next change would validate the output rather than add a fourth rule.
+
+**Note on the sequence:** Iteration 2 changed the evidence the system reads,
+because the measurement was broken. Iteration 3 changed the system itself,
+because the measurement was sound and the system was not. Those are different
+kinds of change and the distinction is worth keeping visible.
+
+**Evidence:** results/agent_v3.json, and the Iteration 3 row in CHANGELOG.md.
+
+## 29 Aug 2026 — The planning brief is archived, not updated
+
+**What happened:** `context.md`, written on the evening of 28 August, still
+described the project as planned rather than as built. It contradicted the
+repository in five places: ten real posts against three synthetic ones, the
+wrong metric list, the Gemini CLI as the build tool, the market undecided,
+and a description of my own experience that claimed more than the work
+supports.
+
+**Options considered:** updating it to match the project, or freezing it as a
+dated record and pointing to the current documents.
+
+**Decision:** rename it `PLAN-2026-08-28.md`, add a header stating it is
+superseded and listing each divergence with a pointer to where that decision
+is recorded, and leave the body untouched — including the parts that turned
+out wrong.
+
+**Why:** updating it would create a maintained duplicate. Every fact stated
+in two places is a place the repository can contradict itself, and this
+project spent a full day repairing exactly that. Freezing it costs nothing
+and preserves something the current documents cannot show: what I believed
+before the evidence arrived. The divergence between the plan and the outcome
+is itself a record that the work followed measurement rather than intention.
+
+**Worth noting:** the header flags that the brief claimed "two years
+independent equity research on NEPSE" when the accurate description is two
+years of personal investing, mostly on technical analysis. I corrected the
+claim in the current documents and left it standing in the archive with the
+correction noted. An overstatement quietly deleted teaches nothing.
