@@ -18,7 +18,7 @@ import statistics
 from pathlib import Path
 
 # Each run's results file. Add new runs here as they are produced.
-RUNS = ["baseline", "agent_v1"]
+RUNS = ["baseline", "agent_v1", "agent_v2"]
 
 CASES_PATH = Path("cases.json")
 
