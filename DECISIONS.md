@@ -1,14 +1,36 @@
+# Decision Log
+
+A record of the choices made while building this project, including the ones
+that were reversed and why. Entries are in the order they were made.
+
 ## 28 Aug 2026, late evening — Which market
 
-**Decision:** [NEPSE / US-listed via EDGAR]
+**Decision:** NEPSE.
 
-**Options considered:** NEPSE, where I have two years of retail
-investing experience, versus US-listed companies, where filings are
-free and machine-readable through EDGAR.
+**Options considered:** NEPSE, where I have two years of personal
+retail investing experience, versus US-listed companies, where
+filings are free and machine-readable through EDGAR.
 
-**Why:** [what you actually find tonight about filing availability]
+**Why:** Familiarity with the market. I invested on NEPSE personally
+from 2021 to 2023, so I know how these claims
+circulate and I know the local conventions that make them
+misleading: dividends quoted against Rs 100 par value rather than
+market price, bonus shares presented as free money, fiscal years
+stated in Bikram Sambat. In a market I had never invested in I would
+not have known which claims were worth testing, or what makes them
+mislead rather than simply being wrong.
 
-**Overruled:** [if applicable]
+EDGAR would have meant structured filings, an API and no manual
+sourcing. NEPSE has no equivalent: results are published as HTML on
+company websites and aggregator portals, in inconsistent formats,
+with no machine-readable feed. That is why the files in `sources/`
+were assembled by hand, with a URL recorded against each individual
+figure. I accepted that cost for the familiarity.
+
+**Disclosure:** I hold no positions on NEPSE, including in any of the
+three companies used as test cases.
+
+**Overruled:** Not applicable — this was the first decision made.
 
 ## 28 Aug 2026, night — Scope boundary: NEPSE only, no claim of generalisation
 
@@ -68,9 +90,9 @@ of the problem is now evidenced rather than asserted.
 
 ## 29 Aug 2026 — The benchmark rate must be looked up, never hardcoded
 
-**Decision:** The agent retrieves the current commercial bank fixed
-deposit rate at runtime and uses it as the benchmark for any
-dividend yield claim. It is never stored as a constant in the code.
+**Decision:** The benchmark deposit rate is read from a dated macro
+context file at run time and used as the comparison for any dividend
+yield claim. It is never written into the code as a constant.
 Because rates vary by tenure and by depositor category, the agent
 reports the range and names the category it is comparing against,
 rather than silently picking one number.
@@ -102,6 +124,12 @@ The spread matters too. A 3.5% dividend yield loses against the 4.0%
 five-year rate but beats the 2.75% short-term rate. Picking one
 number silently would hide that judgement from the user, so the
 agent surfaces the range and names the comparison it is making.
+
+Later widened from one bank to three. The range now used is 2.75% to
+4.55% across NIC Asia, Nabil and Everest, with remittance-linked
+deposits running to 5.55%. Rates cluster tightly, so one bank was
+representative — but a range stated from three sources can be
+checked and a range stated from one cannot.
 
 **Overruled:** Both of us, and neither of us was wrong. I wrote that
 rates reached 15%, recalling remittance-linked deposits. My
@@ -138,7 +166,7 @@ why I understand this problem, not as a claim about 2026.
   — NIC Asia Bank
   https://www.nicasiabank.com/interest-rates/
 
-  ## 29 Aug 2026 — Environment dependency: TLS interception
+## 29 Aug 2026 — Environment dependency: TLS interception
 
 **What happened:** pip and the Gemini client both failed with
 certificate verification errors. The cause was antivirus software
@@ -150,12 +178,93 @@ PowerShell terminal. "It works on my machine" turned out to mean "it
 works in one particular shell on my machine" — which is a sharper
 version of exactly what the reproducibility criterion is testing.
 
-**Decision:** keep every workaround outside the project. No
-certificate paths in code, none in requirements.txt. The fix lives
-in my shell and is documented in REPRODUCE.md as an environment
-note, so the project stays portable to a machine without this issue.
+**Decision:** nothing machine-specific enters the project. No
+certificate file paths, no hostnames, no `--trusted-host`, no
+disabled verification. Anything that only makes sense on this laptop
+stays in my shell and is documented in REPRODUCE.md as an
+environment note.
 
-**Resolution:** [fill in once fixed]
+**Resolution:** the fix is the `truststore` package. It tells Python
+to read the operating system's certificate store, where the
+intercepting certificate is already trusted. Both `baseline.py` and
+`agent.py` call `truststore.inject_into_ssl()` before importing the
+SDK, and truststore is pinned in requirements.txt.
+
+The first attempted fix, setting the `SSL_CERT_FILE` environment
+variable, did not work. The Gemini SDK uses httpx, which carries its
+own bundled certificate list and ignores that variable — which is
+why the failure looked intermittent and shell-dependent for the best
+part of an hour.
+
+**Overruled:** my own stated decision, one paragraph up. I had said
+no workaround would enter the project at all, including
+requirements.txt, and truststore is in both the code and the
+dependency list. The distinction I had missed is between a
+machine-specific workaround and a portable one. A hardcoded
+certificate path describes this laptop and breaks everywhere else. A
+call to read the operating system's trust store describes no
+particular machine: on a laptop without interception it is a no-op,
+and it removes a setup step for anyone behind a corporate proxy
+rather than adding one. The original rule was aimed at the right
+target and drawn in the wrong place.
+
+## 29 Aug 2026 — The pinned model was deprecated mid-project
+
+**What happened:** `gemini-2.5-flash` began returning 404 during the
+runs, with a message naming `gemini-3.6-flash` as its replacement. I
+replaced the model name and re-ran.
+
+**Decision:** pin the exact model in code and record it in
+REPRODUCE.md, while stating plainly that the pin is not a guarantee.
+
+**Why it matters for reproducibility:** the same thing can happen to
+a judge. A pinned model is reproducible only for as long as the
+provider keeps serving it, and that turned out to be days rather
+than years. Recording the model version is still right — without it
+nobody can tell whether a different result came from the code or
+from the model — but it should not be presented as though it made
+the run permanently repeatable.
+
+**Consequence:** REPRODUCE.md names the model under Versions. If the
+model is retired, results will differ from mine, and the file should
+say so rather than leaving a reader to discover it through a 404.
+
+## 29 Aug 2026 — Protecting the comparison from drift and from loss
+
+**Decision:** three safeguards. `agent.py` imports `MODEL` from
+`baseline.py` rather than declaring its own, so the two runs cannot
+drift onto different models. `agent.py` refuses to run if its output
+file already exists — `baseline.py` does not yet carry the same
+guard. And `check_results.py` recomputes the headline timings and
+token counts directly from the result files, so the figures quoted
+in CHANGELOG.md can be checked rather than trusted.
+
+**Options considered:** declaring the model separately in each
+script and remembering to keep them in step; letting each run
+overwrite its predecessor; reporting averages worked out by hand.
+
+**Why:** the whole claim of this project is that one number differs
+from another because of one change. That claim is worth nothing if
+the two runs silently used different models, nothing if the earlier
+run's evidence has been overwritten by the later one, and nothing if
+the averages themselves were never checked. All three failures are
+quiet: none produces an error, and each leaves a plausible-looking
+file behind.
+
+The second safeguard came from a near miss. `agent.py` wrote to
+`results/agent_v1.json` by default, so re-running it for Iteration 2
+would have destroyed the evidence for a changelog row I had just
+spent an hour validating. The run name is now a single constant that
+the filename and the JSON label both derive from, and an existing
+file stops the run before it reaches the API.
+
+The third came from finding two wrong numbers by hand-checking. If
+hand arithmetic produced errors twice, it should not be the last
+word on any figure that a script can recompute.
+
+**Consequence for the design:** a results file is evidence, not
+output. It is never hand-edited and never overwritten. To change
+one, re-run the script under a new run name.
 
 ## 29 Aug 2026 — The improvement axis is verification, not explanation
 
@@ -174,17 +283,26 @@ value versus market price conflation unprompted, showed the
 arithmetic for why bonus shares are value-neutral, and rejected
 "guaranteed income" correctly.
 
-Measured against my own assessments it scored 2 of 3 on verdict
+Measured against my own assessments it scored 3 of 3 on verdict
 agreement, 0 of 3 on figures traceable to a source, and 0 of 1 on
 catching the attribution error. Mean 15.8 seconds and about 1,832
 tokens per case.
 
-Three gaps came out of that.
+That first number is the finding, and it is not the one I expected
+to report. Verdict agreement does not distinguish a grounded system
+from an ungrounded one. Both reach the right answer on all three
+cases. What separates them is whether the answer rests on anything.
+
+Two gaps came out of that.
 
 **Verification.** Every number the baseline produced was invented. It
 guessed a market price of "NPR 600 or more" and concluded the yield
-"might only be 3% to 5%". The reasoning was sound and the figures
-were illustrative.
+"might only be 3% to 5%", when the real figure is 12.50 / 540.20 =
+2.31% — below the lowest deposit rate surveyed. It was right by
+argument and wrong on the arithmetic, and it had no way to tell the
+difference, which means neither does the user. More precisely: the
+baseline never disputes a premise. It accepts every figure in the
+claim and argues only about what the figure means.
 
 **Attribution.** On the challenging case it reached the right verdict
 for entirely different reasons than mine — value trap risk, earnings
@@ -193,20 +311,12 @@ belongs to the sector rather than to EBL. It could not, and it said
 so: the claim "cannot be fact-checked" without identifying the
 source.
 
-**Discrimination.** On the Nabil case I judged the claim partly
-supported, because the 30% dividend is genuine — a true figure inside
-a misleading frame. The baseline called the whole claim unsupported.
-It cannot separate the accurate part from the misleading part, so it
-condemns everything. For a real user that is its own failure: being
-told "this is all wrong" teaches nothing and invites them to stop
-listening.
-
 **Consequence for the design:** the agent must retrieve the filing
 and state the actual declared dividend, the actual market price, the
 computed yield and today's actual deposit rate rather than guessed
-ones. It must check whose figure a number belongs to. It must
-separate what is true in a claim from what is misleading about it.
-And every claim it makes must cite the passage it came from.
+ones. It must check whose figure a number belongs to, and separate
+what is accurate in a claim from what is misleading about it. And
+every claim it makes must cite the passage it came from.
 
 Baseline: "your yield might be around 5%."
 Agent: "Nabil declared X, the share trades at Y, the yield is Z, and
@@ -216,6 +326,9 @@ here is the page it came from."
 prompt or more thorough reasoning would be the improvement. The
 evidence says otherwise. Had I not run the baseline before building
 the agent, I would have spent the weekend optimising the wrong axis.
+
+A third gap was recorded here and later withdrawn. See the entry
+below on the ground truth correction.
 
 **Evidence:** results/baseline.json, generated 29 Aug 2026.
 
@@ -260,3 +373,84 @@ ShareSansar was being credited for the current rates when those came from the
 banks directly. The attribution was correct but the presentation was
 ambiguous, and ambiguous attribution is the failure this project exists to
 catch.
+
+## 29 Aug 2026 — The ground truth was corrected once, after the runs
+
+**Decision:** Case 1's verdict in CASES.md was revised from "partly
+supported" to "unsupported" after both systems had already been run.
+Rather than quietly restating the verdicts, I am recording the change,
+what caused it, and what it did to the measurements.
+
+**What happened:** the Nabil claim quotes a 30% dividend. I had accepted
+that the declared figure was genuine and that the claim was misleading
+only in how it framed a true number, so I judged it partly supported.
+During the file audit I checked the source. Nabil declared a 12.50% cash
+dividend and no bonus shares. The quoted figure is not a true number in
+a misleading frame; it is contradicted by the source outright. The
+verdict became unsupported.
+
+**Why the timing does not invalidate the measurement:** a ground truth
+adjusted after seeing results is worthless unless you can say what moved
+it. What moved this one was the source document, not either system's
+output. Both result files were then re-scored against the corrected
+verdict, and both moved identically — baseline and agent each went from
+2 of 3 to 3 of 3 on verdict agreement. That is confirmed rather than
+assumed: both files record "unsupported" on Case 1. The comparison
+between the two systems is therefore unaffected. The disclosure is in
+REPRODUCE.md so that anyone reproducing the numbers meets it before they
+meet the scores.
+
+**What it cost:** a finding. I had recorded a third gap, "discrimination"
+— that the baseline condemns a whole claim rather than separating the
+accurate part from the misleading part — and built it on the assumption
+that the 30% was real. Once the figure was checked, the gap dissolved:
+there is no accurate part to separate. I have removed it rather than
+leave a conclusion standing on a premise I never verified. Two gaps, not
+three.
+
+**Overruled:** myself, and my assistant, who asserted at one point that
+Nabil had genuinely declared 30%. Neither of us checked it against the
+source file that was already sitting in the repository.
+
+**Worth noting:** the error is a figure taken on trust and never traced
+to its source — which is the exact failure this project was built to
+catch. It survived a day of work on a tool designed to detect it, and
+was caught only by a line-by-line audit against the sources.
+
+## 29 Aug 2026 — The source files answered the question for the agent
+
+**What happened:** validating results/agent_v1.json line by line, I found
+that only one of the six substantive quotes the agent returned is a
+published figure. The rest are sentences I wrote. On the challenging case
+its attribution finding quotes "That figure belongs to the sector, not to
+EBL, and covers a different period from EBL's 2081/82 annual results" — a
+sentence sitting in sources/ebl.md under a heading reading "Sector context
+— required for the attribution check".
+
+**What that means:** the 1 of 1 on attribution measures retrieval, not
+detection. I wrote the answer into the file and signposted it. The agent
+found the signpost.
+
+**Options considered:** leaving the sources as they are and reporting the
+score with a footnote, versus rebuilding them and re-running with two days
+left.
+
+**Decision:** Iteration 2 strips the conclusions out of the source files
+into a separate notes/ folder, leaving published figures with their URLs
+and the raw sector fact without commentary, and re-runs as agent_v2.
+Whatever that produces is the honest result. If the attribution error
+still surfaces, the finding stands. If it does not, the negative result
+is reported as the finding instead.
+
+**Why:** a caveat does not repair a measurement. Any judge who opens
+sources/ebl.md sees that heading, and at that point a footnote reads as
+damage control rather than disclosure. It is cheaper to run the
+experiment than to defend a number I do not believe.
+
+**Overruled:** my own source-file design. I built those files to be
+readable by me and wrote my working into them, and that working then
+became the agent's evidence. A grounding corpus is not documentation.
+Anything in it that reads like an answer will be returned as one.
+
+**Evidence:** results/agent_v1.json, and the caveat recorded against
+Iteration 1 in CHANGELOG.md.
