@@ -106,6 +106,16 @@ and its remaining problems are recorded in `final_violations` for that case.
 The run does not fail. In the recorded run every case came out clean, two of
 them on the second attempt, but model output varies and yours may not.
 
+One thing to expect, and it is a defect rather than a design. `agent.py`
+hands the validator the source files as written, line breaks intact.
+`validate.py`, when you score a finished run, hands it the same files with
+whitespace collapsed. A quote spanning a line break fails the first and
+passes the second. So the corrections you watch happen in the terminal may
+not appear as violations when you score the run afterwards: in the shipped
+run, all four recorded violations recompute to zero. The loop is stricter
+than the score. This is recorded in DECISIONS.md and has deliberately not
+been fixed, because fixing it would change what every stored run means.
+
 ## Run the evaluation
 
 Two parts, because two different kinds of claim are being checked.
