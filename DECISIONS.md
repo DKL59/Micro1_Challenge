@@ -749,3 +749,70 @@ five seconds. The four gaps are described in README.md's failure-mode
 section and referenced from the metric definition in CHANGELOG.md.
 
 **Evidence:** `test_validate.py`, twenty-three tests, all passing.
+
+## 30 Aug 2026, morning — The loop and the scorer were not applying the same rule
+
+**What happened:** writing the video script, I went to narrate one execution
+from `results/agent_v4.json` and could not explain why a citation had been
+rejected. Case 3's first attempt quoted "Commercial banks' combined net profit
+rose 32.33% to NPR 69.78 arba in Q4 2082/83." The line is in `sources/ebl.md`.
+The run recorded it as a violation.
+
+**How it was found:** re-running today's `validate_response` against that
+attempt's recorded response and its recorded prompt returns no violation at
+all. Every violation `agent_v4` recorded — one on Case 3, three on Case 2 —
+recomputes to zero. The run and the score disagree about the same four
+citations.
+
+**The mechanism:** both paths call the same function. They feed it different
+text. `agent.py`'s `load_sources()` returns
+`Path(rel).read_text(encoding="utf-8")` — the file as written, line breaks
+intact — and passes that dictionary to `validate_response()` at run time.
+`validate.py`'s own `check_run()` builds its dictionary through
+`sources_from_prompt()`, which returns `normalise(...)` of each block, with
+whitespace collapsed. Rule 2 asks whether the normalised quote appears in the
+source. Against raw text, a quote spanning a line break does not. Against
+normalised text, it does.
+
+Every rejected quote in that run spans a line break. Every corrected quote
+stops at one. The model was not learning to cite better. It was learning
+where the file wraps.
+
+**What it means:** the correction loop was policing a stricter rule than the
+one that scores this project's results, and the strictness was accidental.
+Under the scoring rule, `agent_v4` would have been clean on the first attempt
+for all three cases — three API calls rather than five, and roughly 6,844
+mean tokens per case rather than 10,741.
+
+**What it does not affect:** every figure in the schema violations column of
+CHANGELOG.md comes from running `validate.py` against the stored result files,
+consistently, across all five runs. Those counts are unchanged. The zero for
+Iteration 4 stands, and so do the 5, 2 and 4 before it.
+
+**What it does affect:** three sentences that describe the run rather than the
+rule. "The model still breaks its own schema on the first attempt", "two of
+three cases needed correcting", and the five-call figure. All three are true
+of what happened and misleading about what it means. They are corrected in
+README.md, CHANGELOG.md and REPRODUCE.md, each pointing here.
+
+**Why it is not being fixed:** the same reason as the four gaps recorded last
+night. Aligning the two paths changes what the shipped agent does, on the day
+it ships, and would leave every recorded run describing a system that no
+longer exists. The defect is documented and the disagreement is reproducible.
+
+**Overruled:** my own conclusion, one entry above, that writing
+`test_validate.py` had covered the validator. It covered the *function*. Every
+test in it calls `validate_response` with a sources dictionary the test builds
+itself, so not one of them could have caught two callers constructing that
+dictionary differently. A unit test cannot see an integration it never
+exercises, and I wrote twenty-three of them without noticing that the thing
+they all had in common was the thing that was wrong.
+
+**The uncomfortable part:** this defect is the only reason there is any
+evidence the correction loop works. Under the intended rule, `agent_v4` would
+have passed first time on every case, the loop would never have fired, and
+Iteration 4 would have shipped an untested mechanism reporting a clean run.
+The demonstration exists because of a bug.
+
+**Evidence:** `results/agent_v4.json`, attempts recorded per case;
+`agent.py` line 108; `validate.py`'s `sources_from_prompt`.

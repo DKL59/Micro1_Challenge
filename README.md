@@ -238,12 +238,25 @@ driven by them — tightening a rule now would re-score five runs against a
 contract the agent was never given. The tests pin the behaviour instead, and
 fail if it changes.
 
-Two further questions are open. The model still breaks its own schema on the
-first attempt — two of three cases needed correcting in the final run — so
-the loop is repairing behaviour rather than the model getting it right. And
-Iteration 4 changed two things at once, the loop and two instruction rules,
-so how much of the zero belongs to the loop is not established. The control
-run that would settle it is written and waiting on a quota reset.
+A fifth defect sits outside those four, and it is the largest. The correction
+loop and the scoring script call the same validator with different text.
+`agent.py` passes the source files as written, line breaks intact.
+`validate.py` passes them with whitespace collapsed. A quote spanning a line
+break fails the first and passes the second. Every violation Iteration 4
+recorded — three on Case 2, one on Case 3 — recomputes to zero under the
+scoring rule, and every rejected quote in that run spans a line break while
+every corrected one stops at one. The model was not learning to cite better.
+It was learning where the file wraps. So the loop fired four times against a
+rule stricter than the one that scores this project, and under the intended
+rule the shipped run would have been clean on the first attempt for all three
+cases. The zero itself is unaffected: every count in CHANGELOG.md comes from
+the scoring path, applied consistently to all five stored runs. What changes
+is what the loop was doing. `DECISIONS.md` records it in full.
+
+One question remains open. Iteration 4 changed two things at once, the loop
+and two instruction rules, so how much of the zero belongs to the loop is not
+established. The control run that would settle it is written and waiting on a
+quota reset.
 
 The next steps are of very different kinds. Checking the arithmetic in
 `computed` is a few lines of code and would close the gap above. Checking
