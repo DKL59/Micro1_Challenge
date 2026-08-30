@@ -31,7 +31,7 @@ from pathlib import Path
 
 VALID_STATUSES = {"verified", "contradicted", "not_found"}
 
-RUNS = ["agent_v1", "agent_v2", "agent_v3", "agent_v4"]
+RUNS = ["agent_v1", "agent_v2", "agent_v3", "agent_v4", "agent_v5"]
 
 # Matches numbers with optional thousands separators and decimals: 729.50,
 # 4,839,903,472, 32.33, 2081.

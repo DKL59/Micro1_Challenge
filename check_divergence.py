@@ -18,7 +18,7 @@ from pathlib import Path
 
 from validate import sources_from_prompt, validate_response
 
-RUNS = ["agent_v1", "agent_v2", "agent_v3", "agent_v4"]
+RUNS = ["agent_v1", "agent_v2", "agent_v3", "agent_v4", "agent_v5"]
 
 disagreements = 0
 
