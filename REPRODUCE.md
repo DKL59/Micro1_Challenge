@@ -120,7 +120,7 @@ been fixed, because fixing it would change what every stored run means.
 
 Two parts, because two different kinds of claim are being checked.
 
-The reproducible part is checked by three scripts. None of them needs an API
+The reproducible part is checked by four scripts. None of them needs an API
 key or a network connection, and none writes anything.
 
     python check_results.py
@@ -148,6 +148,17 @@ final count, and exits non-zero if anything fails. The four gap tests are
 written to fail if a rule is ever tightened — which is the signal to update
 the failure-mode section of README.md alongside the code.
 
+    python check_divergence.py
+
+recomputes every recorded attempt twice: once with the violation count the
+correction loop saw at the time, and once with the count the scoring path
+produces from the same response. It prints both per attempt, and a total of
+the attempts where the two disagree -- four, two in each of the two runs that
+record attempts. This is the one-command reproduction of the fifth defect set
+out in README.md and DECISIONS.md: `agent.py` gives the validator the source
+files as written, `validate.py` gives it the same files with whitespace
+collapsed, and a quote spanning a line break fails the first while passing
+the second.
 If you produce runs under new names, add them to the `RUNS` list at the top of
 `check_results.py` and `validate.py` and they will be scored alongside the
 rest.
@@ -225,6 +236,7 @@ Three cases per run.
 | agent_v2 | 15.3s | 15.0 / 14.3 / 16.6 | 4,805 |
 | agent_v3 | 20.3s | 24.2 / 18.5 / 18.1 | 5,620 |
 | agent_v4 | 70.1s | 53.5 / 82.6 / 74.3 | 10,741 |
+| agent_v5 | 20.7s | 31.0 / 15.7 / 15.5 | 6,373 |
 
 The per-case times are given because with three cases a mean is fragile:
 agent_v1's mean is one slow case pulling two fast ones, and its median of

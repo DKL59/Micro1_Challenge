@@ -166,7 +166,7 @@ out at the top of `CHANGELOG.md`. Two of the four metrics are recomputable
 from the result files without an API key: `check_results.py` gives per-case
 timings, token counts and verdict agreement; `validate.py` gives the schema
 violation count for any run. `test_validate.py` checks the validator's own
-three rules against twenty-three hand-built tests, and needs no key either.
+three rules against twenty-three hand-built tests, and needs no key either. `check_divergence.py` reprints, per attempt, both the violation count the correction loop saw and the count the scoring path produces, so the divergence described below reproduces in one command.
 
 ## Improvement changelog
 
