@@ -195,13 +195,7 @@ Iteration 2 can be read directly from the evidence rather than taken on trust.
 response, the violations found and the tokens spent, for each pass through the
 loop. Where a case took two attempts, both are there.
 
-A sixth file is present and is not one of the five:
-`results/agent_v5-quota-failed.json` is the control run — the shipped
-instruction with the correction loop disabled — which exhausted the daily
-quota before completing. It is kept rather than deleted because results files
-are evidence, and a failed run is evidence too. It backs no row in
-CHANGELOG.md, is not listed in either scoring script, and should not be read
-as a result.
+Two further files sit alongside those five. results/agent_v5.json is the control run: the shipped instruction with the correction loop disabled, MAX_ATTEMPTS set to 1. It scores identically to agent_v4 on both machine-checked metrics, at a third of the time and two thirds of the tokens, and DECISIONS.md records what that means. results/agent_v5-quota-failed.json is an earlier attempt at the same control that exhausted the daily quota before completing. It is kept rather than deleted because results files are evidence and a failed run is evidence too; it backs no claim and should not be read as a result.
 
 A fresh run writes `results/<RUN_NAME>.json`. Both scripts print progress to
 the terminal and confirm the file written.

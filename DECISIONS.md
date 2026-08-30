@@ -816,3 +816,46 @@ The demonstration exists because of a bug.
 
 **Evidence:** `results/agent_v4.json`, attempts recorded per case;
 `agent.py` line 108; `validate.py`'s `sources_from_prompt`.
+
+## 30 Aug 2026, afternoon — The control run: the loop bought nothing measurable
+
+**The question:** Iteration 4 changed two things at once, the correction loop
+and two instruction rules. Every earlier iteration changed one. So the loop's
+independent contribution was never established.
+
+**The control:** `agent_v5` — the same instruction, the same sources, the same
+model, with `MAX_ATTEMPTS = 1`. The validator still runs and still records what
+it finds, but nothing is ever sent back for correction.
+
+**What it found at run time:** Case 1 clean, Case 2 three violations, Case 3
+one. The same pattern as Iteration 4's first attempts, and with the loop
+disabled those four violations stand rather than being repaired.
+
+**What it scores:** verdict agreement 3/3, schema violations 0 — identical to
+Iteration 4. Mean 20.7s and 6,373 tokens per case, against Iteration 4's 70.1s
+and 10,741.
+
+**The result:** the loop cost 3.4 times the wall-clock time and 1.7 times the
+tokens, and moved the scored metric by nothing at all.
+
+**The honest reading, which is narrower than that sounds.** The loop
+demonstrably works: it repaired four real violations, and `agent_v5` shows what
+the output looks like when it does not. But the violations it repairs are
+violations of the runtime rule, and the runtime rule is stricter than the
+scoring rule for the reason recorded in the entry above. Against the rule that
+scores this project, the loop changes nothing. Against the rule it enforces, it
+takes four failures to zero.
+
+**Predicted before running, which is why it is worth stating.** The morning's
+finding implied this exactly: if every violation Iteration 4 recorded
+recomputes to zero under the scoring path, then a run that never corrects
+anything must score the same as a run that corrects everything. It did. The
+control turned an inference into a measurement, and that is the only reason it
+is reported here as a result rather than as an argument.
+
+**What it does not settle:** whether the two instruction rules added in
+Iteration 4 contributed anything. Both runs carry them. Isolating those would
+need a third condition and there is no time.
+
+**Evidence:** `results/agent_v5.json`; `python validate.py` and
+`python check_results.py` both list it.

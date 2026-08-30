@@ -255,8 +255,7 @@ is what the loop was doing. `DECISIONS.md` records it in full.
 
 One question remains open. Iteration 4 changed two things at once, the loop
 and two instruction rules, so how much of the zero belongs to the loop is not
-established. The control run that would settle it is written and waiting on a
-quota reset.
+established. That control has now run. results/agent_v5.json is the same instruction with MAX_ATTEMPTS set to 1, so the validator flags but never corrects. It scores 3/3 on verdicts and 0 schema violations, identical to Iteration 4, at 20.7s and 6,373 mean tokens against 70.1s and 10,741. The loop cost 3.4 times the time and 1.7 times the tokens and moved the scored metric by nothing. It did repair four violations under the stricter runtime rule, which agent_v5 leaves standing, so the loop improves compliance with the rule it enforces and changes nothing against the rule that scores this project.
 
 The next steps are of very different kinds. Checking the arithmetic in
 `computed` is a few lines of code and would close the gap above. Checking
