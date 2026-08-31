@@ -1,7 +1,8 @@
 # Presentation
 
 `PRAMAAN.pptx` and `PRAMAAN.pdf` — the slides behind the solution video.
-Thirteen slides, following the six beats the challenge asks the video to cover:
+Fourteen slides — a title, an agenda, then the six beats the challenge asks the
+video to cover:
 the problem and the simple baseline, one execution start to finish, the final
 comparison and the changelog, the change that contributed most, and one
 experiment removed.
@@ -34,7 +35,8 @@ user, five defects shipped unfixed — the fuller version is in `README.md` unde
 
 ## One thing the slides say that the changelog says more carefully
 
-Slide 7 separates two questions that are easy to conflate:
+The comparison slide (slide 9) separates two questions that are easy to
+conflate:
 
 - **Biggest change from the baseline** is traceability, 0/3 to 3/3.
 - **Biggest change across the iterations** is schema violations, 5 to 0 — which
