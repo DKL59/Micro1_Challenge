@@ -4,6 +4,10 @@ A tool that checks whether an investment claim circulating publicly is
 actually supported by the company's published results and current market
 conditions. It does not tell anyone what to buy.
 
+A slide summary of the whole project is in
+[presentation/PRAMAAN.pdf](presentation/PRAMAAN.pdf) — it renders in the
+browser, no download needed.
+
 ## Intended user
 
 There are many kinds of participants in the NEPSE market: institutional
